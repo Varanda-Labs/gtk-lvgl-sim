@@ -7,6 +7,7 @@
 #
 set(SIM_FILES 
     src/sim/lvgl-sim.c
+    src/sim/lvgl-integration.c
     )
 
 

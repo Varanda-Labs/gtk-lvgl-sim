@@ -88,6 +88,8 @@ main (int   argc,
 
   g_signal_connect (app, "activate", G_CALLBACK (app_activated_cb), NULL);
 
+  lv_int_init();
+
   return g_application_run (G_APPLICATION (app), argc, argv);
 }
 
