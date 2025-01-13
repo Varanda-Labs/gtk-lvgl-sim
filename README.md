@@ -1,9 +1,8 @@
 ## LVGL Smulator based on GTK4
 
 Easy to build and modify the demo App for developing your own UI.
-- Note: this branch and following instructions work for Debian based distros supporting libgtk-4, ex: Debian 12, Ubuntu 22.04, etc.
-- For GTK3 use the gtk3 branch and instruction in there.
-- Windows and Mac: while easily possible to port this simulator to those platforms I do not like promoting the enemies. Fill free to fork this and add support in your own repo. I will not merge it in here.
+
+- Windows and Mac: while easily portable to these platforms I refuse to promote spywares. Fill free to fork this repo and support those in your own. I will not merge ports for those in here.
 
 ### Checkout this repo
 ```

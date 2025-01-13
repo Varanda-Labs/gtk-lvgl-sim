@@ -1,6 +1,8 @@
 #if 1
 
 #include <gtk/gtk.h>
+#include "lcd_config.h"
+#include "lvgl-integration.h"
 
 static cairo_surface_t *s_cairo_surface = NULL;
 
@@ -128,6 +130,8 @@ int main (int argc, char **argv)
 
     app = gtk_application_new ("org.gtk3.cairo", G_APPLICATION_FLAGS_NONE);
     g_signal_connect (app, "activate", G_CALLBACK (cb_application_activate), NULL);
+
+    lv_int_init();
     status = g_application_run (G_APPLICATION (app), argc, argv);
     g_object_unref (app);
 
