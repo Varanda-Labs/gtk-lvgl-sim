@@ -5,8 +5,12 @@ include(sources-files.cmake)
 set(NAME "lvgl-sim")
 project(${NAME} LANGUAGES C)
 
+#find_package(PkgConfig REQUIRED)
+#pkg_check_modules(GTK3 REQUIRED IMPORTED_TARGET gtk3)
+
+# Use the package PkgConfig to detect GTK+ headers/library files
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTK4 REQUIRED IMPORTED_TARGET gtk4)
+pkg_check_modules(GTK REQUIRED gtk+-3.0)
 
 add_executable(${NAME} 
     ${SIM_FILES}
@@ -14,7 +18,7 @@ add_executable(${NAME}
 
 target_link_libraries(${NAME} 
     PRIVATE 
-    PkgConfig::GTK4
+    PkgConfig::GTK
     lvgl)
 
 add_subdirectory(lvgl-build)
