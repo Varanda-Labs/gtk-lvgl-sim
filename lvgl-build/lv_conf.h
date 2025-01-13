@@ -7,6 +7,8 @@
  * COPY THIS FILE AS `lv_conf.h` NEXT TO the `lvgl` FOLDER
  */
 
+ #include "lcd_config.h"
+
 #if 1 /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H

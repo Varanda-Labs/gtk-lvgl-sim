@@ -9,12 +9,12 @@
  */
 
 #include <gtk/gtk.h>
+#include "lcd_config.h"
 
 #define BYTES_PER_R8G8B8 3
-#define WIDTH  400
+#define WIDTH  LCD_WIDTH
 
-static void
-fill_row (GByteArray *array,
+static void fill_row (GByteArray *array,
           guint8      value,
           int         row_size)
 {
@@ -28,8 +28,7 @@ fill_row (GByteArray *array,
   }
 }
 
-static void
-add_pixel_picture (GtkPicture *picture)
+static void add_pixel_picture (GtkPicture *picture)
 {
   g_autoptr(GBytes) bytes = NULL;
   GdkTexture *texture;
@@ -54,16 +53,15 @@ add_pixel_picture (GtkPicture *picture)
   gtk_picture_set_paintable (picture, GDK_PAINTABLE (texture));
 }
 
-static void
-app_activated_cb (GtkApplication *app)
+static void app_activated_cb (GtkApplication *app)
 {
   GtkWindow *window;
   GtkWidget *picture;
 
   window = GTK_WINDOW (gtk_application_window_new (app));
   g_object_set (window,
-                "width-request", 500,
-                "height-request", 400,
+                "width-request", LCD_WIDTH,
+                "height-request", LCD_HEIGHT,
                 NULL);
   picture = gtk_picture_new ();
   gtk_widget_add_css_class (picture, "frame");

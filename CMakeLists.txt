@@ -17,4 +17,6 @@ target_link_libraries(${NAME}
     PkgConfig::GTK4
     lvgl)
 
+include_directories( ${CMAKE_SOURCE_DIR})
+
 add_subdirectory(lvgl-build)
