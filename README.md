@@ -12,10 +12,10 @@ git clone https://github.com/Varanda-Labs/gtk-lvgl-sim.git
 
 ### Install Dependencies
 ```
-sudo apt install build-essential cmake libgtk-4-dev
+sudo apt install build-essential cmake libgtk-3-dev glade
 ```
 
-### to Build
+To Build
 ```
 cd gtk-lvgl-sim
 ./build.sh
