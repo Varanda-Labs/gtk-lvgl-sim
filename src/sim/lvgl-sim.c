@@ -1,32 +1,8 @@
 
 #include <gtk/gtk.h>
-#include "lcd_config.h"
+#include "sim_config.h"
 #include "lvgl-integration.h"
 #include "logger.h"
-
-static void clear_surface ()
-{
-    CHECK_SURFACE();
-    cairo_t *cr = cairo_create (lv_int_surface);
-
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_paint (cr);
-
-    cairo_destroy (cr);
-}
-
-static void draw_brush (GtkWidget *widget, gdouble x, gdouble y)
-{
-    #define BRUSH_SIZE 1
-    CHECK_SURFACE();
-    cairo_t *cr = cairo_create (lv_int_surface);
-
-    cairo_rectangle (cr, x, y, BRUSH_SIZE, BRUSH_SIZE);
-    cairo_fill (cr);
-    cairo_destroy (cr);
-
-    gtk_widget_queue_draw_area (widget, x, y, BRUSH_SIZE, BRUSH_SIZE);
-}
 
 static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
@@ -40,8 +16,6 @@ static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event,
                                                CAIRO_CONTENT_COLOR,
                                                LCD_WIDTH,   // maybe:  gtk_widget_get_allocated_width (widget)
                                                LCD_HEIGHT); // maybe: gtk_widget_get_allocated_width (widget)
-
-    clear_surface ();
 
     return TRUE;
 }
@@ -60,12 +34,6 @@ static gboolean cb_button_press_event (GtkWidget *widget, GdkEventButton *event,
      if (lv_int_surface == NULL)
         return FALSE;
 
-    // if (event->button == GDK_BUTTON_PRIMARY)
-    //     draw_brush (widget, event->x, event->y);
-    // else if (event->button == GDK_BUTTON_SECONDARY) {
-    //     clear_surface ();
-    //     gtk_widget_queue_draw (widget);
-    // }
     if (event->button == GDK_BUTTON_PRIMARY) {
         lv_int_set_pointer(event->x, event->y, 2 * TOUCH_PRESSURE);
     }
@@ -78,12 +46,6 @@ static gboolean cb_button_release_event (GtkWidget *widget, GdkEventButton *even
      if (lv_int_surface == NULL)
         return FALSE;
 
-    // if (event->button == GDK_BUTTON_PRIMARY)
-    //     draw_brush (widget, event->x, event->y);
-    // else if (event->button == GDK_BUTTON_SECONDARY) {
-    //     clear_surface ();
-    //     gtk_widget_queue_draw (widget);
-    // }
     if (event->button == GDK_BUTTON_PRIMARY) {
         lv_int_set_pointer(event->x, event->y, 0);
     }
@@ -96,9 +58,9 @@ static gboolean cb_motion_notify_event (GtkWidget *widget, GdkEventMotion *event
     if (lv_int_surface == NULL)
         return FALSE;
 
-    if (event->state & GDK_BUTTON1_MASK)
+    if (event->state & GDK_BUTTON1_MASK) {
         lv_int_set_pointer(event->x, event->y, 2 * TOUCH_PRESSURE);
-        //draw_brush (widget, event->x, event->y);
+    }
 
     return TRUE;
 }
@@ -107,11 +69,12 @@ static void cb_window_destory ()
 {
     if (lv_int_surface != NULL)
         cairo_surface_destroy (lv_int_surface);
+    drawing_area = NULL;
+    
 }
 
 
 static gboolean time_handler(GtkWidget *widget) {
-    //LOG("Timer called\n");
     if (widget == NULL) {
         return FALSE;
     }
@@ -136,7 +99,7 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     GtkApplicationWindow *window = GTK_APPLICATION_WINDOW (gtk_builder_get_object (builder, "application_window"));
     g_warn_if_fail (window != NULL);
     g_object_set (window, "application", app, NULL);
-    gtk_window_set_title (GTK_WINDOW (window), "Cairo draw test");
+    gtk_window_set_title (GTK_WINDOW (window), "LVGL Simulator");
     g_signal_connect (window, "destroy", G_CALLBACK (cb_window_destory), NULL);
 
     {
@@ -165,7 +128,7 @@ int main (int argc, char **argv)
     GtkApplication *app;
     int status;
 
-    app = gtk_application_new ("org.gtk3.cairo", G_APPLICATION_FLAGS_NONE);
+    app = gtk_application_new ("org.varandalabs.mv", G_APPLICATION_FLAGS_NONE);
     g_signal_connect (app, "activate", G_CALLBACK (cb_application_activate), NULL);
 
     lv_int_init();

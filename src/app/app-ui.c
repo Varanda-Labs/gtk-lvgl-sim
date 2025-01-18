@@ -3,7 +3,7 @@
 
 void app_init() // mandatory function. Called by the simulator
 {
-
+    lv_obj_clean(lv_screen_active()); 
     lv_obj_t * btn = lv_button_create(lv_screen_active());     /*Add a button the current screen*/
     lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
     lv_obj_set_size(btn, 120, 50);                          /*Set its size*/

@@ -10,6 +10,8 @@ static uint8_t lvgl_buf[LCD_WIDTH * LCD_HEIGHT / 10 * BYTES_PER_PIXEL];
 cairo_surface_t *lv_int_surface = NULL;
 GtkWidget *drawing_area = NULL;
 
+extern void lv_demo_music();
+
 extern void app_init();
 
 lv_display_t * lvgl_display;
@@ -72,6 +74,10 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
 {
     #define PIXEL_SIZE 1
     CHECK_SURFACE();
+    if (!drawing_area) { 
+        lv_display_flush_ready(display);
+        return;
+    }
     cairo_t *cr = cairo_create (lv_int_surface);
 
     int x, y, ri, gi, bi;
@@ -106,7 +112,11 @@ void lv_int_run_slice()
     if (! launched) {
         if (cnt++ >= 10) {
             launched = true;
+#ifdef MUSIC_DEMO
+            lv_demo_music();
+#else
             app_init();
+#endif
         }
     }
     lv_tick_inc(LVGL_PERIOD_TIME);
