@@ -1,12 +1,8 @@
-#if 1
 
 #include <gtk/gtk.h>
 #include "lcd_config.h"
 #include "lvgl-integration.h"
 #include "logger.h"
-
-#define CHECK_SURFACE() do { if (! lv_int_surface) {LOG("invalid lv_int_surface");  return;} } while(0)
-#define CHECK_SURFACE_RET() do { if (! lv_int_surface) {LOG("invalid lv_int_surface");  return FALSE;} } while(0)
 
 static void clear_surface ()
 {
@@ -18,19 +14,6 @@ static void clear_surface ()
 
     cairo_destroy (cr);
 }
-
-// static void draw_brush_ori (GtkWidget *widget, gdouble x, gdouble y)
-// {
-//     #define BRUSH_SIZE 10
-//     CHECK_SURFACE();
-//     cairo_t *cr = cairo_create (lv_int_surface);
-
-//     cairo_rectangle (cr, x - BRUSH_SIZE / 2, y - BRUSH_SIZE / 2, BRUSH_SIZE, BRUSH_SIZE);
-//     cairo_fill (cr);
-//     cairo_destroy (cr);
-
-//     gtk_widget_queue_draw_area (widget, x - BRUSH_SIZE / 2, y - BRUSH_SIZE / 2, BRUSH_SIZE, BRUSH_SIZE);
-// }
 
 static void draw_brush (GtkWidget *widget, gdouble x, gdouble y)
 {
@@ -77,11 +60,32 @@ static gboolean cb_button_press_event (GtkWidget *widget, GdkEventButton *event,
      if (lv_int_surface == NULL)
         return FALSE;
 
-    if (event->button == GDK_BUTTON_PRIMARY)
-        draw_brush (widget, event->x, event->y);
-    else if (event->button == GDK_BUTTON_SECONDARY) {
-        clear_surface ();
-        gtk_widget_queue_draw (widget);
+    // if (event->button == GDK_BUTTON_PRIMARY)
+    //     draw_brush (widget, event->x, event->y);
+    // else if (event->button == GDK_BUTTON_SECONDARY) {
+    //     clear_surface ();
+    //     gtk_widget_queue_draw (widget);
+    // }
+    if (event->button == GDK_BUTTON_PRIMARY) {
+        lv_int_set_pointer(event->x, event->y, 2 * TOUCH_PRESSURE);
+    }
+
+    return TRUE;
+}
+
+static gboolean cb_button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+     if (lv_int_surface == NULL)
+        return FALSE;
+
+    // if (event->button == GDK_BUTTON_PRIMARY)
+    //     draw_brush (widget, event->x, event->y);
+    // else if (event->button == GDK_BUTTON_SECONDARY) {
+    //     clear_surface ();
+    //     gtk_widget_queue_draw (widget);
+    // }
+    if (event->button == GDK_BUTTON_PRIMARY) {
+        lv_int_set_pointer(event->x, event->y, 0);
     }
 
     return TRUE;
@@ -93,7 +97,8 @@ static gboolean cb_motion_notify_event (GtkWidget *widget, GdkEventMotion *event
         return FALSE;
 
     if (event->state & GDK_BUTTON1_MASK)
-        draw_brush (widget, event->x, event->y);
+        lv_int_set_pointer(event->x, event->y, 2 * TOUCH_PRESSURE);
+        //draw_brush (widget, event->x, event->y);
 
     return TRUE;
 }
@@ -142,9 +147,11 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
         g_signal_connect (drawing_area, "configure-event", G_CALLBACK (configure_event_cb), NULL);
         g_signal_connect (drawing_area, "motion-notify-event", G_CALLBACK (cb_motion_notify_event), NULL);
         g_signal_connect (drawing_area, "button-press-event", G_CALLBACK (cb_button_press_event), NULL);
+        g_signal_connect (drawing_area, "button-release-event", G_CALLBACK (cb_button_release_event), NULL);
 
         gtk_widget_set_events (drawing_area, gtk_widget_get_events (drawing_area)
                                            | GDK_BUTTON_PRESS_MASK
+                                           | GDK_BUTTON_RELEASE_MASK
                                            | GDK_POINTER_MOTION_MASK);
     }
 
@@ -167,101 +174,3 @@ int main (int argc, char **argv)
 
     return status;
 }
-
-
-
-#else
-/* pixel.c
- *
- * Compile: gcc -ggdb lvgl-sim.c $(pkg-config --cflags --libs gtk+-3.0) -o lvgl-sim
- * Run: ./pixel
- *
- * Author: Mohammed Sadiq <www.sadiqpk.org>
- *
- * SPDX-License-Identifier: LGPL-2.1-or-later OR CC0-1.0
- */
-
-#include <gtk/gtk.h>
-#include "lcd_config.h"
-
-#define BYTES_PER_R8G8B8 3
-#define WIDTH  LCD_WIDTH
-
-static void fill_row (GByteArray *array,
-          guint8      value,
-          int         row_size)
-{
-  guint i;
-
-  for (i = 0; i < row_size; i++) {
-    /* Fill the same values for RGB */
-    g_byte_array_append (array, &value, 1); /* R */
-    g_byte_array_append (array, &value, 1); /* G */
-    g_byte_array_append (array, &value, 1); /* B */
-  }
-}
-
-static void add_pixel_picture (GtkPicture *picture)
-{
-  g_autoptr(GBytes) bytes = NULL;
-  GdkTexture *texture;
-  GByteArray *pixels;
-  gsize height;
-
-  /* Draw something interesting */
-  pixels = g_byte_array_new ();
-  for (guint i = 0; i <= 0xff ; i++)
-    fill_row (pixels, i, WIDTH);
-
-  for (guint i = 0; i <= 0xff; i++)
-    fill_row (pixels, 0xff - i, WIDTH);
-
-  height = pixels->len / (WIDTH * BYTES_PER_R8G8B8);
-  bytes = g_byte_array_free_to_bytes (pixels);
-
-  texture = gdk_memory_texture_new (WIDTH, height,
-                                    GDK_MEMORY_R8G8B8,
-                                    bytes,
-                                    WIDTH * BYTES_PER_R8G8B8);
-  gtk_picture_set_paintable (picture, GDK_PAINTABLE (texture));
-}
-
-static void app_activated_cb (GtkApplication *app)
-{
-  GtkWindow *window;
-  GtkWidget *picture;
-
-  window = GTK_WINDOW (gtk_application_window_new (app));
-  g_object_set (window,
-                "width-request", LCD_WIDTH,
-                "height-request", LCD_HEIGHT,
-                NULL);
-  picture = gtk_picture_new ();
-  gtk_widget_add_css_class (picture, "frame");
-  g_object_set (picture,
-                "margin-start", 96,
-                "margin-end", 96,
-                "margin-top", 96,
-                "margin-bottom", 96,
-                NULL);
-
-  gtk_window_set_child (window, picture);
-  add_pixel_picture (GTK_PICTURE (picture));
-
-  gtk_window_present (window);
-}
-
-int
-main (int   argc,
-      char *argv[])
-{
-  g_autoptr(GtkApplication) app = gtk_application_new (NULL, 0);
-
-  g_signal_connect (app, "activate", G_CALLBACK (app_activated_cb), NULL);
-
-  lv_int_init();
-
-  return g_application_run (G_APPLICATION (app), argc, argv);
-}
-#endif
-
