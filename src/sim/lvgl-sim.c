@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include "lcd_config.h"
 #include "lvgl-integration.h"
+#include "logger.h"
 
 static cairo_surface_t *s_cairo_surface = NULL;
 
@@ -85,6 +86,13 @@ static void cb_window_destory ()
         cairo_surface_destroy (s_cairo_surface);
 }
 
+
+static gboolean time_handler(GtkWidget *widget) {
+    LOG("Timer called\n");
+    if (widget == NULL) return FALSE;
+    return TRUE;
+}
+
 static void cb_application_activate (GtkApplication* app, gpointer user_data)
 {
     GtkBuilder* builder = gtk_builder_new ();
@@ -120,6 +128,7 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     }
 
     gtk_widget_show_all (GTK_WIDGET (window));
+    g_timeout_add(1000, (GSourceFunc) time_handler, (gpointer) window);
     g_object_unref (builder);
 }
 
