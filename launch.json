@@ -1,19 +1,45 @@
-// for Native-Debug extention: https://github.com/WebFreak001/code-debug
-// Mainly for Codium if you do not like using the MS spyware vscode.
-// copy this file to .vscode/ directory:
-//   mkdir .vscode
-//   cp launch.json .vscode
+// - First configuration if for debugging with Native-Debug extention: 
+//     https://github.com/WebFreak001/code-debug
+//     Mainly for Codium if you do not like using the MS spyware vscode.
+// - Second configuration in case you are using vscode with MS C/C++ extension
+//
+// - To activate debug:
+//     create and copy this file to .vscode/ directory:
+//       mkdir .vscode
+//       cp launch.json .vscode
+//
 // Maybe you need to erase these comment lines if commented JSON is not supported
+// Have fun !!!
+
 {
    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Native-Debug (WebFreak)",
+            "name": "For Native-Debug (WebFreak)",
             "type": "gdb",
             "request": "launch",
             "target": "${workspaceRoot}/build/lvgl-sim",
             "cwd": "${workspaceRoot}",
             "valuesFormatting": "parseText"
+        },
+        {
+            "name": "For spyware MS debugger",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/build/lvgl-sim",
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerArgs": "--eval-command 'handle SIGPIPE nostop noprint pass' --eval-command='handle SIG34 noprint pass'",
         }
     ]
 }
