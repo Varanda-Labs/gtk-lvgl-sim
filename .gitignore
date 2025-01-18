@@ -54,4 +54,8 @@ dkms.conf
 lvgl-sim
 build
 .vscode
-
+CMakeCache.txt
+CMakeFiles
+build.ninja
+cmake_install.cmake
+lvgl-build/cmake_install.cmake

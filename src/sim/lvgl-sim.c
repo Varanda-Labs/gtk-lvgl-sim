@@ -5,11 +5,13 @@
 #include "lvgl-integration.h"
 #include "logger.h"
 
-static cairo_surface_t *s_cairo_surface = NULL;
+#define CHECK_SURFACE() do { if (! lv_int_surface) {LOG("invalid lv_int_surface");  return;} } while(0)
+#define CHECK_SURFACE_RET() do { if (! lv_int_surface) {LOG("invalid lv_int_surface");  return FALSE;} } while(0)
 
 static void clear_surface ()
 {
-    cairo_t *cr = cairo_create (s_cairo_surface);
+    CHECK_SURFACE();
+    cairo_t *cr = cairo_create (lv_int_surface);
 
     cairo_set_source_rgb (cr, 1, 1, 1);
     cairo_paint (cr);
@@ -17,29 +19,44 @@ static void clear_surface ()
     cairo_destroy (cr);
 }
 
+// static void draw_brush_ori (GtkWidget *widget, gdouble x, gdouble y)
+// {
+//     #define BRUSH_SIZE 10
+//     CHECK_SURFACE();
+//     cairo_t *cr = cairo_create (lv_int_surface);
+
+//     cairo_rectangle (cr, x - BRUSH_SIZE / 2, y - BRUSH_SIZE / 2, BRUSH_SIZE, BRUSH_SIZE);
+//     cairo_fill (cr);
+//     cairo_destroy (cr);
+
+//     gtk_widget_queue_draw_area (widget, x - BRUSH_SIZE / 2, y - BRUSH_SIZE / 2, BRUSH_SIZE, BRUSH_SIZE);
+// }
+
 static void draw_brush (GtkWidget *widget, gdouble x, gdouble y)
 {
-    #define BRUSH_SIZE 10
+    #define BRUSH_SIZE 1
+    CHECK_SURFACE();
+    cairo_t *cr = cairo_create (lv_int_surface);
 
-    cairo_t *cr = cairo_create (s_cairo_surface);
-
-    cairo_rectangle (cr, x - BRUSH_SIZE / 2, y - BRUSH_SIZE / 2, BRUSH_SIZE, BRUSH_SIZE);
+    cairo_rectangle (cr, x, y, BRUSH_SIZE, BRUSH_SIZE);
     cairo_fill (cr);
     cairo_destroy (cr);
 
-    gtk_widget_queue_draw_area (widget, x - BRUSH_SIZE / 2, y - BRUSH_SIZE / 2, BRUSH_SIZE, BRUSH_SIZE);
+    gtk_widget_queue_draw_area (widget, x, y, BRUSH_SIZE, BRUSH_SIZE);
 }
 
 static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
-    if (s_cairo_surface != NULL)
-        cairo_surface_destroy (s_cairo_surface);
+    if (lv_int_surface != NULL)
+        cairo_surface_destroy (lv_int_surface);
 
-    s_cairo_surface = gdk_window_create_similar_surface (
+    gtk_widget_set_size_request( widget, LCD_WIDTH, LCD_HEIGHT);
+
+    lv_int_surface = gdk_window_create_similar_surface (
                                                gtk_widget_get_window (widget),
                                                CAIRO_CONTENT_COLOR,
-                                               gtk_widget_get_allocated_width (widget),
-                                               gtk_widget_get_allocated_height (widget));
+                                               LCD_WIDTH,   // maybe:  gtk_widget_get_allocated_width (widget)
+                                               LCD_HEIGHT); // maybe: gtk_widget_get_allocated_width (widget)
 
     clear_surface ();
 
@@ -48,7 +65,8 @@ static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event,
 
 static gboolean cb_draw (GtkWidget *widget, cairo_t *cr, gpointer data)
 {
-    cairo_set_source_surface (cr, s_cairo_surface, 0, 0);
+    CHECK_SURFACE_RET();
+    cairo_set_source_surface (cr, lv_int_surface, 0, 0);
     cairo_paint (cr);
 
     return TRUE;
@@ -56,7 +74,7 @@ static gboolean cb_draw (GtkWidget *widget, cairo_t *cr, gpointer data)
 
 static gboolean cb_button_press_event (GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-     if (s_cairo_surface == NULL)
+     if (lv_int_surface == NULL)
         return FALSE;
 
     if (event->button == GDK_BUTTON_PRIMARY)
@@ -71,7 +89,7 @@ static gboolean cb_button_press_event (GtkWidget *widget, GdkEventButton *event,
 
 static gboolean cb_motion_notify_event (GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
-    if (s_cairo_surface == NULL)
+    if (lv_int_surface == NULL)
         return FALSE;
 
     if (event->state & GDK_BUTTON1_MASK)
@@ -82,8 +100,8 @@ static gboolean cb_motion_notify_event (GtkWidget *widget, GdkEventMotion *event
 
 static void cb_window_destory ()
 {
-    if (s_cairo_surface != NULL)
-        cairo_surface_destroy (s_cairo_surface);
+    if (lv_int_surface != NULL)
+        cairo_surface_destroy (lv_int_surface);
 }
 
 
@@ -117,7 +135,7 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     g_signal_connect (window, "destroy", G_CALLBACK (cb_window_destory), NULL);
 
     {
-        GtkWidget *drawing_area = GTK_WIDGET (gtk_builder_get_object (builder, "drawing_area"));
+        drawing_area = GTK_WIDGET (gtk_builder_get_object (builder, "drawing_area"));
         g_warn_if_fail (drawing_area != NULL);
 
         g_signal_connect (drawing_area, "draw", G_CALLBACK (cb_draw), NULL);
