@@ -5,6 +5,9 @@ include(sources-files.cmake)
 set(NAME "lvgl-sim")
 project(${NAME} LANGUAGES C)
 
+# for production comment out the following line
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb")
+
 # Use the package PkgConfig to detect GTK+ headers/library files
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED gtk+-3.0)

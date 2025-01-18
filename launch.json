@@ -1,0 +1,19 @@
+// for Native-Debug extention: https://github.com/WebFreak001/code-debug
+// Mainly for Codium if you do not like using the MS spyware vscode.
+// copy this file to .vscode/ directory:
+//   mkdir .vscode
+//   cp launch.json .vscode
+// Maybe you need to erase these comment lines if commented JSON is not supported
+{
+   "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Native-Debug (WebFreak)",
+            "type": "gdb",
+            "request": "launch",
+            "target": "${workspaceRoot}/build/lvgl-sim",
+            "cwd": "${workspaceRoot}",
+            "valuesFormatting": "parseText"
+        }
+    ]
+}

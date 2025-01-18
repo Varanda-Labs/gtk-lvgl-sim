@@ -88,8 +88,11 @@ static void cb_window_destory ()
 
 
 static gboolean time_handler(GtkWidget *widget) {
-    LOG("Timer called\n");
-    if (widget == NULL) return FALSE;
+    //LOG("Timer called\n");
+    if (widget == NULL) {
+        return FALSE;
+    }
+    lv_int_run_slice();
     return TRUE;
 }
 
@@ -128,7 +131,7 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     }
 
     gtk_widget_show_all (GTK_WIDGET (window));
-    g_timeout_add(1000, (GSourceFunc) time_handler, (gpointer) window);
+    g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) window);
     g_object_unref (builder);
 }
 

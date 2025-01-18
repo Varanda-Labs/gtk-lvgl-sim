@@ -1,6 +1,7 @@
 
 #include "lvgl.h"
 #include "lvgl-integration.h"
+#include "logger.h"
 
 #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565))
 static uint8_t lvgl_buf[LCD_WIDTH * LCD_HEIGHT / 10 * BYTES_PER_PIXEL];
@@ -45,6 +46,12 @@ static uint64_t get_timestamp_ms()
 
 static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
 {
+    static int t = 0;
+    if (++t % 100 == 0) {
+        LOG("flush called\n");
+    }
+
+    lv_display_flush_ready(display);
 #if 0
     int x,y;
     lcd_q_item_t item;
