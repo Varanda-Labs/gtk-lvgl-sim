@@ -22,8 +22,8 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          (480) // (320) //(480)
-#define LV_VER_RES_MAX          (320) // (240) //(320)
+#define LV_HOR_RES_MAX          LCD_WIDTH
+#define LV_VER_RES_MAX          LCD_HEIGHT
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -762,7 +762,7 @@ typedef void * lv_obj_user_data_t;
 
 //--------------- Music demo -----------------
 # define LV_DEMO_MUSIC_SQUARE       0
-# define LV_DEMO_MUSIC_LANDSCAPE    0
+# define LV_DEMO_MUSIC_LANDSCAPE    1
 # define LV_DEMO_MUSIC_ROUND        0
 # define LV_DEMO_MUSIC_LARGE        0
 # define LV_DEMO_MUSIC_AUTO_PLAY    0

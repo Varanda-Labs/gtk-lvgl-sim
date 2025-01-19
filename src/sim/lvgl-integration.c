@@ -76,12 +76,18 @@ static void input_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 static uint64_t get_timestamp_ms()
 {
     struct timespec tp;
+    static uint64_t t_ini = 0;
     if (clock_gettime(CLOCK_MONOTONIC, &tp)) {
         LOG_E("get_timestamp_ms: clock_gettime error");
         return 0;
     }
     uint64_t t = tp.tv_sec * 1000; // sec to milli
     t += tp.tv_nsec / 1000000;        // nano to milli
+    if (t_ini == 0) {
+        t_ini = t;
+        t = 0;
+    }
+    else t -= t_ini;
     return t;
 }
 

@@ -22,8 +22,10 @@ add_executable(${NAME}
 target_link_libraries(${NAME} 
     PRIVATE 
     lvgl
+    demos
     ${GTK_LIBRARIES})
 
 include_directories( ${CMAKE_SOURCE_DIR})
 
 add_subdirectory(lvgl-build)
+add_subdirectory(lvgl-demos)
