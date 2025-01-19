@@ -1,4 +1,4 @@
-## LVGL Smulator based on GTK4
+## LVGL Smulator based on GTK3
 
 Easy to build and modify the demo App for developing your own UI.
 
