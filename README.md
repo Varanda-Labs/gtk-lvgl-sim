@@ -2,7 +2,7 @@
 
 Easy to build and modify the demo App for developing your own UI.
 
-- Windows and Mac: while easily portable to these platforms I refuse to promote spywares. Fill free to fork this repo and support those in your own. I will not merge ports for those in here.
+- Windows and Mac: while easily portable to these platforms I do not want to promote spywares.
 
 ### Checkout this repo
 ```
