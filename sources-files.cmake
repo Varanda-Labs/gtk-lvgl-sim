@@ -1,3 +1,12 @@
+#####################################
+#
+#  GTK LVGL Simulator
+#
+#  Copyright (c) 2025 Varanda Labs
+#  MIT License
+#
+#####################################
+
 #
 # list of simulator source files
 #

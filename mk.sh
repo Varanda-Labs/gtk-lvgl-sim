@@ -1,4 +1,13 @@
 
+#####################################
+#
+#  GTK LVGL Simulator
+#
+#  Copyright (c) 2025 Varanda Labs
+#  MIT License
+#
+#####################################
+
 set -e
 
 # checkout submodules if needed

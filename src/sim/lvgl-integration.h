@@ -1,3 +1,14 @@
+/*
+ *************************************
+ *
+ *  GTK LVGL Simulator
+ *
+ *  Copyright (c) 2025 Varanda Labs
+ *  MIT License
+ *
+ *************************************
+ */
+
 #pragma once
 
 #include <gtk/gtk.h>

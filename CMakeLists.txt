@@ -1,3 +1,12 @@
+#####################################
+#
+#  GTK LVGL Simulator
+#
+#  Copyright (c) 2025 Varanda Labs
+#  MIT License
+#
+#####################################
+
 cmake_minimum_required(VERSION 3.12.4)
 
 include(sources-files.cmake)

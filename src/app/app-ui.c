@@ -1,4 +1,15 @@
 
+/*
+ *************************************
+ *
+ *  GTK LVGL Simulator
+ *
+ *  Copyright (c) 2025 Varanda Labs
+ *  MIT License
+ *
+ *************************************
+ */
+
 #include "lvgl.h"
 
 #define SIMPLE_APP

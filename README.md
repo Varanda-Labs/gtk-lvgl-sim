@@ -53,3 +53,6 @@ Native-Debug extension:  https://github.com/WebFreak001/code-debug
 - if using MS spyware use the second configuration
 extension C/C++ from Microsoft
 
+### License
+MIT, read [LICENSE](LICENSE) file
+

@@ -1,3 +1,12 @@
+#####################################
+#
+#  GTK LVGL Simulator
+#
+#  Copyright (c) 2025 Varanda Labs
+#  MIT License
+#
+#####################################
+
 set(LVGL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../lvgl)
 
 if(MUSIC_DEMO)
