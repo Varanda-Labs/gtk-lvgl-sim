@@ -6,7 +6,11 @@ set(NAME "lvgl-sim")
 project(${NAME} LANGUAGES C)
 
 # for production comment out the following line
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb")
+if(DEBUG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb")
+else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+endif()
 
 # Use the package PkgConfig to detect GTK+ headers/library files
 find_package(PkgConfig REQUIRED)

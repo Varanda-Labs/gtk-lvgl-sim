@@ -14,20 +14,31 @@ git clone https://github.com/Varanda-Labs/gtk-lvgl-sim.git
 sudo apt install build-essential cmake libgtk-3-dev glade
 ```
 
-To Build
+### To Build your custom App
 ```
 cd gtk-lvgl-sim
-./build.sh
+./clean.sh
+./mk.sh
 
 ```
+Subsequent rebuilds can skip the clean.sh command
+
+### To Build your LVGL Music Demo
+```
+cd gtk-lvgl-sim
+./clean.sh
+./mk_demo_music.sh
+
+```
+Subsequent rebuilds can skip the clean.sh command
+
 ### To run
 ```
-./build/lvgl-sim
+./run.sh
 ```
 
 ### To clean
 ```
-cd gtk-lvgl-sim
 ./clean.sh
 ```
 
