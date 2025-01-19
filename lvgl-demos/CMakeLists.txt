@@ -1,7 +1,8 @@
 set(LVGL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../lvgl)
 
-# Uncomment the followig line to build music demo
-add_compile_definitions(LV_USE_DEMO_MUSIC)
+if(MUSIC_DEMO)
+  add_compile_definitions(LV_USE_DEMO_MUSIC)
+endif()
 
 file(GLOB_RECURSE SOURCES 
 	${LVGL_ROOT_DIR}/demos/*.c
@@ -18,6 +19,8 @@ target_link_libraries(demos
 
 target_include_directories(demos PUBLIC
 	.
-	../lvgl-build
-	../lvgl/src
+	${CMAKE_CURRENT_LIST_DIR}/../lvgl-build
+	${CMAKE_CURRENT_LIST_DIR}/../lvgl/src
+	${CMAKE_CURRENT_LIST_DIR}/../src/sim
+	${CMAKE_CURRENT_LIST_DIR}/../
 )

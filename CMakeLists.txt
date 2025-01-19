@@ -22,16 +22,38 @@ add_executable(${NAME}
     ${APP_FILES}
 )
 
-target_link_libraries(${NAME} 
-    PRIVATE 
-    lvgl
-    demos
-    ${GTK_LIBRARIES})
+if(MUSIC_DEMO)
+    message("*******************************")
+    message("*                             *")
+    message("* Build setup for MUSIC_DEMO  *")
+    message("*                             *")
+    message("*******************************")
+    target_link_libraries(${NAME} 
+        PRIVATE 
+        lvgl
+        demos
+        ${GTK_LIBRARIES})
+    add_subdirectory(lvgl-demos)
+    add_compile_definitions(
+        LV_USE_DEMO_MUSIC
+        MUSIC_DEMO)
+
+else()
+    message("*******************************")
+    message("*                             *")
+    message("* Build setup for custom App  *")
+    message("*                             *")
+    message("*******************************")
+    target_link_libraries(${NAME} 
+        PRIVATE
+        lvgl
+        ${GTK_LIBRARIES})
+endif()
 
 include_directories( ${CMAKE_SOURCE_DIR})
 
 add_subdirectory(lvgl-build)
-add_subdirectory(lvgl-demos)
+
 
 ###################### build gtk resources #####################
 find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources REQUIRED)
