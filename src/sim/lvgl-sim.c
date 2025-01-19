@@ -4,6 +4,9 @@
 #include "lvgl-integration.h"
 #include "logger.h"
 
+#define APP_PREFIX "/com/varandalabs/lvglsim"
+
+
 static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
     if (lv_int_surface != NULL)
@@ -98,7 +101,9 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     g_return_if_fail (builder != NULL);
 
     GError* error = NULL;
-    if (!gtk_builder_add_from_file (builder, "src/sim/lvgl-sim.glade", &error)) {
+    builder = gtk_builder_new_from_resource(APP_PREFIX "/lvglsim.glade");
+    if (! builder) {
+    //if (!gtk_builder_add_from_file (builder, "src/sim/lvgl-sim.glade", &error)) {
         if (error) {
             g_error ("Failed to load: %s", error->message);
             g_error_free (error);

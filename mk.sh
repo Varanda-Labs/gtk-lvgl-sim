@@ -11,7 +11,8 @@ if [ ! -d "build" ]; then
   echo "creating build directory"
   mkdir build
   cd build
-  cmake ..
+  #cmake ..
+  cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ..
 else
   cd build
 fi
