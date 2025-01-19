@@ -65,6 +65,16 @@ static gboolean cb_motion_notify_event (GtkWidget *widget, GdkEventMotion *event
     return TRUE;
 }
 
+static gboolean cb_leave_event (GtkWidget *widget, GdkEventMotion *event, gpointer data)
+{
+    if (lv_int_surface == NULL)
+        return FALSE;
+
+    lv_int_pointer_left();
+
+    return TRUE;
+}
+
 static void cb_window_destory ()
 {
     if (lv_int_surface != NULL)
@@ -111,10 +121,12 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
         g_signal_connect (drawing_area, "motion-notify-event", G_CALLBACK (cb_motion_notify_event), NULL);
         g_signal_connect (drawing_area, "button-press-event", G_CALLBACK (cb_button_press_event), NULL);
         g_signal_connect (drawing_area, "button-release-event", G_CALLBACK (cb_button_release_event), NULL);
+        g_signal_connect (drawing_area, "leave_notify_event", G_CALLBACK (cb_leave_event), NULL);
 
         gtk_widget_set_events (drawing_area, gtk_widget_get_events (drawing_area)
                                            | GDK_BUTTON_PRESS_MASK
                                            | GDK_BUTTON_RELEASE_MASK
+                                           | GDK_LEAVE_NOTIFY_MASK
                                            | GDK_POINTER_MOTION_MASK);
     }
 

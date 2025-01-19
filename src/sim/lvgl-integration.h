@@ -14,3 +14,4 @@ extern GtkWidget *drawing_area;
 void lv_int_init();
 void lv_int_run_slice();
 void lv_int_set_pointer(int x, int y, int z);
+void lv_int_pointer_left();

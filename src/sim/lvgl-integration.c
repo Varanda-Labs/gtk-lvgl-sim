@@ -28,15 +28,30 @@ void lv_int_set_pointer(int x, int y, int z)
     pointer_z = z;
 }
 
+void lv_int_pointer_left()
+{
+    pointer_z = 0;
+}
+
 static void input_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     uint16_t x,y;
     uint8_t z;
     static bool touch = false;
 
+    LOG("pointer_x = %d, pointer_y = %d\n", pointer_x, pointer_y);
+
     x = pointer_x;
+    if (x >= LCD_WIDTH) x = LCD_WIDTH - 1;
+    if (x < 0) x = 0;
+
     y = pointer_y;
+    if (y >= LCD_HEIGHT) y = LCD_HEIGHT - 1;
+    if (y < 0) y = 0;
+
     z = pointer_z & 0x0000ff;
+    LOG ("x = %d, y = %d\n", x, y);
+
 
     // lcd_get_raw_touch(&x, &y, &z);
 
