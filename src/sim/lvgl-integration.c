@@ -148,7 +148,7 @@ void lv_int_init()
 {
     lv_init();
 
-    lv_tick_set_cb((lv_tick_get_cb_t) get_timestamp_ms);
+    //lv_tick_set_cb((lv_tick_get_cb_t) get_timestamp_ms);
     lvgl_display = lv_display_create(LCD_WIDTH, LCD_HEIGHT);
 
     lv_display_set_buffers( lvgl_display, 
@@ -162,6 +162,4 @@ void lv_int_init()
     indev = lv_indev_create();        /* Create input device connected to Default Display. */
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);   /* Touch pad is a pointer-like device. */
     lv_indev_set_read_cb(indev, input_read_cb);    /* Set driver function. */
-    // app_init();
-
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#define LVGL_PERIOD_TIME    10
+
 #define MUSIC_DEMO
 
 #ifdef MUSIC_DEMO

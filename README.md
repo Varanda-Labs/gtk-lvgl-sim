@@ -31,3 +31,14 @@ cd gtk-lvgl-sim
 ./clean.sh
 ```
 
+### To debug (vscode or codium)
+```
+cd gtk-lvgl-sim
+mkdir .vscode
+cp launch.json .vscode/
+```
+- if using codium (free of MS spyware) use the first configuration
+Native-Debug extension:  https://github.com/WebFreak001/code-debug 
+- if using MS spyware use the second configuration
+extension C/C++ from Microsoft
+
