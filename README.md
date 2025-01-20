@@ -50,6 +50,7 @@ Subsequent rebuilds can skip the clean.sh command
 cd gtk-lvgl-sim
 mkdir .vscode
 cp launch.json .vscode/
+./mk_debug.sh
 ```
 - if using codium (free of MS spyware) use the first configuration
 Native-Debug extension:  https://github.com/WebFreak001/code-debug 
