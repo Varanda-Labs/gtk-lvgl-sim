@@ -5,21 +5,29 @@
   <object class="GtkWindow" id="id_gpio_dialog">
     <property name="name">gpio_dialog</property>
     <property name="can-focus">False</property>
+    <property name="hexpand">True</property>
+    <property name="vexpand">True</property>
     <property name="title" translatable="yes">HAL: GPIO Simulation</property>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
         <child>
           <object class="GtkFrame">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
             <property name="label-xalign">0</property>
             <property name="shadow-type">none</property>
             <child>
               <object class="GtkAlignment">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
                 <property name="bottom-padding">12</property>
                 <property name="left-padding">12</property>
                 <property name="right-padding">12</property>
@@ -28,6 +36,8 @@
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
                     <property name="row-spacing">12</property>
                     <property name="column-spacing">12</property>
                     <child>
@@ -130,10 +140,30 @@
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkScale" id="id_slider">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="tooltip-text" translatable="yes">Analog level</property>
+                        <property name="show-fill-level">True</property>
+                        <property name="fill-level">100</property>
+                        <property name="round-digits">1</property>
+                        <signal name="value-changed" handler="on_slider" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">5</property>
+                      </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Analog</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">5</property>
+                      </packing>
                     </child>
                     <child>
                       <placeholder/>
@@ -159,17 +189,33 @@
           </packing>
         </child>
         <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="margin-start">17</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkFrame">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">36</property>
             <property name="margin-end">12</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
             <property name="label-xalign">0</property>
             <property name="shadow-type">none</property>
             <child>
               <object class="GtkAlignment">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
                 <property name="left-padding">12</property>
                 <child>
                   <!-- n-columns=2 n-rows=6 -->
@@ -177,6 +223,8 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="margin-start">4</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
                     <property name="row-spacing">8</property>
                     <property name="column-spacing">12</property>
                     <child>
@@ -304,7 +352,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
@@ -346,7 +394,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>
