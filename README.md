@@ -1,20 +1,23 @@
 ## LVGL Smulator based on GTK3
 
-Easy to build and modify the demo App for developing your own UI.
+Easy to build and modify the privided skeleton [App](src/app/app-ui.c) for developing your own UI. 
+- The following instructions work for Debian 11, Ubuntu/Mint 20.04 and up. Other Debian/Ubuntu base distros should also work.
 
-- Windows and Mac: while easily portable to these platforms I do not want to promote spywares.
+- Windows and Mac: while easily portable to these platforms I prefer to do not promote spywares.
 
-### Checkout this repo
+### Install Dependencies:
+```
+sudo apt install build-essential cmake libgtk-3-dev glade git
+```
+
+### Checkout this repo and submodules:
 ```
 git clone https://github.com/Varanda-Labs/gtk-lvgl-sim.git
+cd gtk-lvgl-sim
+git submodule update --init --recursive --progress
 ```
 
-### Install Dependencies
-```
-sudo apt install build-essential cmake libgtk-3-dev glade
-```
-
-### To Build your custom App
+### To Build your custom App:
 ```
 cd gtk-lvgl-sim
 ./clean.sh
@@ -23,7 +26,7 @@ cd gtk-lvgl-sim
 ```
 Subsequent rebuilds can skip the clean.sh command
 
-### To Build your LVGL Music Demo
+### To Build your LVGL Music Demo:
 ```
 cd gtk-lvgl-sim
 ./clean.sh
@@ -32,17 +35,17 @@ cd gtk-lvgl-sim
 ```
 Subsequent rebuilds can skip the clean.sh command
 
-### To run
+### To run:
 ```
 ./run.sh
 ```
 
-### To clean
+### To clean:
 ```
 ./clean.sh
 ```
 
-### To debug (vscode or codium)
+### To debug (vscode or codium):
 ```
 cd gtk-lvgl-sim
 mkdir .vscode
