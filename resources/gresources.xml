@@ -2,7 +2,7 @@
 <gresources>
   <gresource prefix="/com/varandalabs/lvglsim">
     <file>lvglsim.glade</file>
-    <file>tab_logo.ico</file>
+    <file>lvgl_icon.png</file>
     <file>logo.png</file>
     <file>led_on.png</file>
     <file>led_off.png</file>
