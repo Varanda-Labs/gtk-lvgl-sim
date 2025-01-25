@@ -125,6 +125,15 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     g_warn_if_fail (window != NULL);
     g_object_set (window, "application", app, NULL);
     gtk_window_set_title (GTK_WINDOW (window), "LVGL Simulator");
+
+    GdkPixbuf * icon = gdk_pixbuf_new_from_resource (APP_PREFIX "/tab_logo.ico", &error);
+    if (icon) {
+
+    }
+    else {
+        LOG_E("Could not load icon\n");
+    }
+
     g_signal_connect (window, "destroy", G_CALLBACK (cb_window_destory), NULL);
 
     {
