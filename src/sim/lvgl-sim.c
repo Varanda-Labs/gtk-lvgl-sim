@@ -110,6 +110,8 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     GtkBuilder* builder = gtk_builder_new ();
     g_return_if_fail (builder != NULL);
 
+    GtkWindow * gpio_win = NULL;
+
     GError* error = NULL;
     builder = gtk_builder_new_from_resource(APP_PREFIX "/lvglsim.glade");
     if (! builder) {
@@ -120,6 +122,8 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
             return ;
         }
     }
+
+    gpio_win = GTK_WINDOW (gtk_builder_get_object (builder, "id_gpio_dialog"));
 
     GtkApplicationWindow *window = GTK_APPLICATION_WINDOW (gtk_builder_get_object (builder, "application_window"));
     g_warn_if_fail (window != NULL);
@@ -155,6 +159,11 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     }
 
     gtk_widget_show_all (GTK_WIDGET (window));
+
+    if (gpio_win) {
+        gtk_widget_show_all (GTK_WIDGET (gpio_win));
+    }
+
     g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) window);
     g_object_unref (builder);
 }
