@@ -15,7 +15,7 @@
 #include "logger.h"
 
 #define APP_PREFIX "/com/varandalabs/lvglsim"
-
+#define WINDOW_SIDE_BY_SIDE_SEPARATION   5
 
 static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
@@ -105,6 +105,29 @@ static gboolean time_handler(GtkWidget *widget) {
     return TRUE;
 }
 
+// place main window and gpio side-by-side in the center of the screen
+static void set_windows_positions(GtkWindow * main_win, GtkWindow * gpio_win)
+{
+    GdkRectangle workarea = {0};
+    gdk_monitor_get_workarea(   gdk_display_get_primary_monitor(gdk_display_get_default()),
+                                &workarea);
+
+    gint main_width, main_height;
+    gint gpio_width, gpio_height;
+    gint total_width, max_height;
+    gint main_x, main_y;      // final pos of the main window
+
+    gtk_window_get_size (main_win, &main_width, &main_height);
+    gtk_window_get_size (gpio_win, &gpio_width, &gpio_height);
+    total_width = main_width + gpio_width;
+    max_height = MAX(main_height, gpio_height);
+    main_x = (workarea.width - total_width) / 2; // we want to center both side-by-side
+    main_y = (workarea.height - max_height) / 2;
+
+    gtk_window_move (main_win, main_x, main_y);
+    gtk_window_move (gpio_win, main_x + main_width + WINDOW_SIDE_BY_SIDE_SEPARATION, main_y);
+}
+
 static void cb_application_activate (GtkApplication* app, gpointer user_data)
 {
     GtkBuilder* builder = gtk_builder_new ();
@@ -115,7 +138,6 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     GError* error = NULL;
     builder = gtk_builder_new_from_resource(APP_PREFIX "/lvglsim.glade");
     if (! builder) {
-    //if (!gtk_builder_add_from_file (builder, "src/sim/lvgl-sim.glade", &error)) {
         if (error) {
             g_error ("Failed to load: %s", error->message);
             g_error_free (error);
@@ -160,7 +182,9 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
 
     gtk_widget_show_all (GTK_WIDGET (window));
 
+
     if (gpio_win) {
+        set_windows_positions(window, gpio_win);
         gtk_widget_show_all (GTK_WIDGET (gpio_win));
     }
 
