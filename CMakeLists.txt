@@ -43,6 +43,7 @@ if(MUSIC_DEMO)
     message("*******************************")
     target_link_libraries(${NAME} 
         PRIVATE 
+        -rdynamic
         lvgl
         demos
         ${GTK_LIBRARIES})
@@ -59,6 +60,7 @@ else()
     message("*******************************")
     target_link_libraries(${NAME} 
         PRIVATE
+        -rdynamic
         lvgl
         ${GTK_LIBRARIES})
 endif()
@@ -66,6 +68,8 @@ endif()
 include_directories( ${CMAKE_SOURCE_DIR})
 
 add_subdirectory(lvgl-build)
+
+add_link_options(rdynamic)
 
 
 ###################### build gtk resources #####################

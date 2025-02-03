@@ -17,6 +17,33 @@
 #define APP_PREFIX "/com/varandalabs/lvglsim"
 #define WINDOW_SIDE_BY_SIDE_SEPARATION   5
 
+void on_gpio_close_clicked(GtkWidget *widget, gpointer data)
+{
+    LOG("Close button\n");
+}
+
+void on_menu_quit(GtkWidget *widget, gpointer data)
+{
+    LOG("Close button, data = %p\n", data);
+}
+
+void on_menu_gpio(GtkWidget *widget, gpointer data)
+{
+    LOG("Menu GPIO, data = %p\n", data);
+}
+
+void on_slider(GtkWidget *widget, gpointer data)
+{
+    gdouble v = gtk_range_get_value (widget);
+    LOG("Slider, data = %f\n", v);
+}
+
+void on_sw_set(GtkWidget *widget, gpointer data)
+{
+    LOG("Switch %s is %s\n", gtk_widget_get_name(widget), (data) ? "ON" : "OFF");
+}
+
+
 static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 {
     if (lv_int_surface != NULL)
@@ -179,6 +206,8 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
                                            | GDK_LEAVE_NOTIFY_MASK
                                            | GDK_POINTER_MOTION_MASK);
     }
+
+    gtk_builder_connect_signals(builder,NULL);
 
     gtk_widget_show_all (GTK_WIDGET (window));
 
