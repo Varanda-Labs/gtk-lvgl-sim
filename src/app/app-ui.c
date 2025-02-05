@@ -11,6 +11,7 @@
  */
 
 #include "lvgl.h"
+//#include "lv_slider.h"
 
 //#define SIMPLE_APP
 
@@ -57,14 +58,14 @@ static void create_widgets(void)
 {
     int i;
     char txt[32];
-    static int32_t col_dsc[] = {    COL_SIZE,   // 6 coluns
+    static int32_t col_dsc[] = {    COL_SIZE,   // 5 coluns
                                     COL_SIZE,
                                     COL_SIZE,
                                     COL_SIZE,
                                     COL_SIZE,
                                     LV_GRID_TEMPLATE_LAST};
 
-    static int32_t row_dsc[] = {    ROW_SIZE,   // 5 rows
+    static int32_t row_dsc[] = {    ROW_SIZE,   // 6 rows
                                     ROW_SIZE,
                                     ROW_SIZE,
                                     ROW_SIZE,
@@ -116,25 +117,27 @@ static void create_widgets(void)
                             LV_GRID_ALIGN_START, 1 + i, 1);
     }
 
-    // Analog
-#if 0
-    lv_obj_t * scale = lv_scale_create(cont);
-    lv_obj_set_size(scale, lv_pct(80), 100);
-    //lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
-    lv_obj_center(scale);
+    // label Analog Input
+    label = lv_label_create(cont);
+    lv_label_set_text(label, " Analog Input:");
+    lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, 1,
+                        LV_GRID_ALIGN_START, 5, 1);
 
-    lv_scale_set_label_show(scale, true);
-
-    lv_scale_set_total_tick_count(scale, 31);
-    lv_scale_set_major_tick_every(scale, 5);
-
-    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
-    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
-    lv_scale_set_range(scale, 0, 100);
-
-    lv_obj_set_grid_cell(scale, LV_GRID_ALIGN_START, 0, 1,
+    // Bar
+    lv_obj_t * bar1 = lv_bar_create(cont);
+    lv_obj_set_size(bar1, 240, 20);
+    lv_obj_center(bar1);
+    lv_bar_set_value(bar1, 50, LV_ANIM_OFF);
+    lv_obj_set_grid_cell(bar1, LV_GRID_ALIGN_START, 2, 1,
                             LV_GRID_ALIGN_START, 5, 1);
-#endif
+
+    // bar value
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "      100%");
+    lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 1, 1, // col
+                         LV_GRID_ALIGN_START, 5, 1);     // row
 }
 #endif
 
