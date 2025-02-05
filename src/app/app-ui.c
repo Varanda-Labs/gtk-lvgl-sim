@@ -12,7 +12,7 @@
 
 #include "lvgl.h"
 
-#define SIMPLE_APP
+//#define SIMPLE_APP
 
 #ifndef SIMPLE_APP
 static void switch_event_handler(lv_event_t * e)
@@ -26,7 +26,7 @@ static void switch_event_handler(lv_event_t * e)
 
 static void create_switches(void)
 {
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP); //LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * sw;
@@ -46,6 +46,96 @@ static void create_switches(void)
     lv_obj_add_state(sw, LV_STATE_CHECKED | LV_STATE_DISABLED);
     lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_ALL, NULL);
 }
+
+#define COL_SIZE 70
+#define ROW_SIZE 40
+
+static lv_obj_t * GPIO_in[4];
+static lv_obj_t * GPIO_out[4];
+
+static void create_widgets(void)
+{
+    int i;
+    char txt[32];
+    static int32_t col_dsc[] = {    COL_SIZE,   // 6 coluns
+                                    COL_SIZE,
+                                    COL_SIZE,
+                                    COL_SIZE,
+                                    COL_SIZE,
+                                    LV_GRID_TEMPLATE_LAST};
+
+    static int32_t row_dsc[] = {    ROW_SIZE,   // 5 rows
+                                    ROW_SIZE,
+                                    ROW_SIZE,
+                                    ROW_SIZE,
+                                    ROW_SIZE,
+                                    ROW_SIZE,
+                                    LV_GRID_TEMPLATE_LAST};
+
+    /*Create a container with grid*/
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
+    lv_obj_set_size(cont, LCD_WIDTH, LCD_HEIGHT);
+    lv_obj_center(cont);
+
+    lv_obj_t * label;
+    lv_obj_t * obj;
+
+
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "GPIO Test Screen");
+    lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 2, 1, // col
+                         LV_GRID_ALIGN_START, 0, 5);     // row
+
+    for (i=0; i<4; i++) {
+        // label "Output n"
+        label = lv_label_create(cont);
+        snprintf(txt, sizeof(txt), "Output %d", i + 1);
+        lv_label_set_text(label, txt);
+        lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, 1,
+                            LV_GRID_ALIGN_START, 1 + i, 1);
+
+        // switch
+        GPIO_out[i] = lv_switch_create(cont);
+        lv_obj_set_grid_cell(GPIO_out[i], LV_GRID_ALIGN_END, 1, 1,
+                            LV_GRID_ALIGN_START, 1 + i, 1);
+
+        // label "input 1"
+        label = lv_label_create(cont);
+        snprintf(txt, sizeof(txt), "Input %d", i + 1);
+        lv_label_set_text(label, txt);
+        lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 3, 1,
+                            LV_GRID_ALIGN_START, 1 + i, 1);
+
+        // LED
+        GPIO_in[i] = lv_led_create(cont);
+        lv_obj_set_grid_cell(GPIO_in[i], LV_GRID_ALIGN_END, 4, 1,
+                            LV_GRID_ALIGN_START, 1 + i, 1);
+    }
+
+    // Analog
+#if 0
+    lv_obj_t * scale = lv_scale_create(cont);
+    lv_obj_set_size(scale, lv_pct(80), 100);
+    //lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_obj_center(scale);
+
+    lv_scale_set_label_show(scale, true);
+
+    lv_scale_set_total_tick_count(scale, 31);
+    lv_scale_set_major_tick_every(scale, 5);
+
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
+    lv_scale_set_range(scale, 0, 100);
+
+    lv_obj_set_grid_cell(scale, LV_GRID_ALIGN_START, 0, 1,
+                            LV_GRID_ALIGN_START, 5, 1);
+#endif
+}
 #endif
 
 void app_init() // mandatory function. Called by the simulator
@@ -61,6 +151,7 @@ void app_init() // mandatory function. Called by the simulator
     lv_label_set_text(label, "Button");                     /*Set the labels text*/
     lv_obj_center(label);
 #else
-    create_switches();
+    //create_switches();
+    create_widgets();
 #endif
 }
