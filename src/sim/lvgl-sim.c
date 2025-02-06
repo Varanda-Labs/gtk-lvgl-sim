@@ -13,6 +13,7 @@
 #include "sim_config.h"
 #include "lvgl-integration.h"
 #include "logger.h"
+#include "app-ui.h"
 
 #define APP_PREFIX "/com/varandalabs/lvglsim"
 #define WINDOW_SIDE_BY_SIDE_SEPARATION   5
@@ -30,6 +31,7 @@ void on_menu_quit(GtkWidget *widget, gpointer data)
 void on_menu_gpio(GtkWidget *widget, gpointer data)
 {
     LOG("Menu GPIO, data = %p\n", data);
+
 }
 
 void on_slider(GtkWidget *widget, gpointer data)
@@ -40,7 +42,28 @@ void on_slider(GtkWidget *widget, gpointer data)
 
 void on_sw_set(GtkWidget *widget, gpointer data)
 {
-    LOG("Switch %s is %s\n", gtk_widget_get_name(widget), (data) ? "ON" : "OFF");
+    char * name = gtk_widget_get_name(widget);
+    LOG("Switch %s is %s\n", name, (data) ? "ON" : "OFF");
+    int i;
+
+    if (strcmp(name, "sw1") == 0) {
+        i = 0;
+    }
+    else if (strcmp(name, "sw2") == 0) {
+        i = 1;
+    }
+    else if (strcmp(name, "sw3") == 0) {
+        i = 2;
+    }
+    else if (strcmp(name, "sw4") == 0) {
+        i = 3;
+    }
+    else  {
+        LOG_E("error: unknown widget name %s\n", name);
+        return;
+    }
+
+    lv_obj_send_event(GPIO_in[i], input_change_event, data);
 }
 
 
@@ -54,8 +77,8 @@ static gboolean configure_event_cb (GtkWidget *widget, GdkEventConfigure *event,
     lv_int_surface = gdk_window_create_similar_surface (
                                                gtk_widget_get_window (widget),
                                                CAIRO_CONTENT_COLOR,
-                                               LCD_WIDTH,   // maybe:  gtk_widget_get_allocated_width (widget)
-                                               LCD_HEIGHT); // maybe: gtk_widget_get_allocated_width (widget)
+                                               LCD_WIDTH,
+                                               LCD_HEIGHT);
 
     return TRUE;
 }

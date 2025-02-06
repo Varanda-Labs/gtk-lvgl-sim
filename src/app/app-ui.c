@@ -11,7 +11,20 @@
  */
 
 #include "lvgl.h"
-//#include "lv_slider.h"
+#include "app-ui.h"
+#include "logger.h"
+
+#define COL_SIZE 70
+#define ROW_SIZE 40
+#define LED_BRIGHTNESS_ON   500
+#define LED_BRIGHTNESS_OFF  50
+
+// Global events
+uint32_t input_change_event;
+lv_obj_t * GPIO_in[4];
+lv_obj_t * analog_input_bar;
+
+static lv_obj_t * GPIO_out[4];
 
 //#define SIMPLE_APP
 
@@ -25,34 +38,27 @@ static void switch_event_handler(lv_event_t * e)
     }
 }
 
-static void create_switches(void)
+static void on_analog_input_changed_event(lv_event_t * e)
 {
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP); //LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    uint32_t led_idx = (uint32_t) lv_event_get_user_data(e);
+    uint32_t on_off = (uint32_t) lv_event_get_param(e);
 
-    lv_obj_t * sw;
-
-    sw = lv_switch_create(lv_scr_act());
-    lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_ALL, NULL);
-
-    sw = lv_switch_create(lv_scr_act());
-    lv_obj_add_state(sw, LV_STATE_CHECKED);
-    lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_ALL, NULL);
-
-    sw = lv_switch_create(lv_scr_act());
-    lv_obj_add_state(sw, LV_STATE_DISABLED);
-    lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_ALL, NULL);
-
-    sw = lv_switch_create(lv_scr_act());
-    lv_obj_add_state(sw, LV_STATE_CHECKED | LV_STATE_DISABLED);
-    lv_obj_add_event_cb(sw, switch_event_handler, LV_EVENT_ALL, NULL);
+    LOG("analog led_idx = %d, on_off = %d\n", led_idx, on_off);
 }
 
-#define COL_SIZE 70
-#define ROW_SIZE 40
+static void on_led_input_changed_event(lv_event_t * e)
+{
+    uint32_t led_idx = (uint32_t) lv_event_get_user_data(e);
+    uint32_t on_off = (uint32_t) lv_event_get_param(e);
 
-static lv_obj_t * GPIO_in[4];
-static lv_obj_t * GPIO_out[4];
+    LOG("led_idx = %d, on_off = %d\n", led_idx, on_off);
+    if (on_off) {
+        lv_led_set_brightness(GPIO_in[led_idx], LED_BRIGHTNESS_ON);
+    }
+    else {
+        lv_led_set_brightness(GPIO_in[led_idx], LED_BRIGHTNESS_OFF);
+    }
+}
 
 static void create_widgets(void)
 {
@@ -72,6 +78,8 @@ static void create_widgets(void)
                                     ROW_SIZE,
                                     ROW_SIZE,
                                     LV_GRID_TEMPLATE_LAST};
+
+    input_change_event = lv_event_register_id();
 
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
@@ -115,6 +123,11 @@ static void create_widgets(void)
         GPIO_in[i] = lv_led_create(cont);
         lv_obj_set_grid_cell(GPIO_in[i], LV_GRID_ALIGN_END, 4, 1,
                             LV_GRID_ALIGN_START, 1 + i, 1);
+        lv_obj_add_event_cb(GPIO_in[i], on_led_input_changed_event, input_change_event, (void *) i);
+        //lv_obj_add_event_cb(GPIO_in[i], on_led_input_changed_event, input_change_event, i);
+        lv_led_set_color(GPIO_in[i], lv_palette_main(LV_PALETTE_RED));
+        lv_led_set_brightness(GPIO_in[i], LED_BRIGHTNESS_OFF);
+
     }
 
     // label Analog Input
@@ -125,12 +138,13 @@ static void create_widgets(void)
                         LV_GRID_ALIGN_START, 5, 1);
 
     // Bar
-    lv_obj_t * bar1 = lv_bar_create(cont);
-    lv_obj_set_size(bar1, 240, 20);
-    lv_obj_center(bar1);
-    lv_bar_set_value(bar1, 50, LV_ANIM_OFF);
-    lv_obj_set_grid_cell(bar1, LV_GRID_ALIGN_START, 2, 1,
+    analog_input_bar = lv_bar_create(cont);
+    lv_obj_set_size(analog_input_bar, 240, 20);
+    lv_obj_center(analog_input_bar);
+    lv_bar_set_value(analog_input_bar, 50, LV_ANIM_OFF);
+    lv_obj_set_grid_cell(analog_input_bar, LV_GRID_ALIGN_START, 2, 1,
                             LV_GRID_ALIGN_START, 5, 1);
+    lv_obj_add_event_cb(analog_input_bar, on_analog_input_changed_event, input_change_event, NULL);
 
     // bar value
     label = lv_label_create(cont);
@@ -138,6 +152,7 @@ static void create_widgets(void)
     lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 1, 1, // col
                          LV_GRID_ALIGN_START, 5, 1);     // row
+
 }
 #endif
 
@@ -154,7 +169,6 @@ void app_init() // mandatory function. Called by the simulator
     lv_label_set_text(label, "Button");                     /*Set the labels text*/
     lv_obj_center(label);
 #else
-    //create_switches();
     create_widgets();
 #endif
 }
