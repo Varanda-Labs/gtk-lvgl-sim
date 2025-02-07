@@ -11,22 +11,27 @@
  */
 
 #include "lvgl.h"
-#include "app-ui.h"
 #include "logger.h"
+
+#define GPIO_APP
+
+#ifdef GPIO_APP
+// ******************************
+// *
+// *       GPIO Test App
+// *
+// ******************************
+#include "app-ui.h"
 
 #define COL_SIZE 70
 #define ROW_SIZE 40
-#define LED_BRIGHTNESS_ON   255 //500
+#define LED_BRIGHTNESS_ON   255
 #define LED_BRIGHTNESS_OFF  50
-
 
 static lv_obj_t * GPIO_in[4];
 static lv_obj_t * analog_input_bar;
 static lv_obj_t * GPIO_out[4];
 
-//#define SIMPLE_APP
-
-#ifndef SIMPLE_APP
 static void switch_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -140,21 +145,43 @@ static void create_widgets(void)
                          LV_GRID_ALIGN_START, 5, 1);     // row
 
 }
-#endif
 
-void app_init() // mandatory function. Called by the simulator
+
+void app_init() // mandatory function.
 {
-#ifdef SIMPLE_APP
+    create_widgets();
+}
+
+#else
+// ******************************
+// *
+// *   Very simple App (1 button)
+// *
+// ******************************
+#define LABEL_FMT "Button %d"
+static int cnt = 0;
+static lv_obj_t * label;
+static void btn_event_cb(lv_event_t * e)
+{
+    char txt[32];
+    snprintf(txt, sizeof(txt), LABEL_FMT, ++cnt);
+    lv_label_set_text(label, txt);
+}
+
+void ui_set_led(int led_index, int on_1_off_0){} // stub
+
+void app_init() // mandatory function.
+{
     lv_obj_clean(lv_screen_active()); 
     lv_obj_t * btn = lv_button_create(lv_screen_active());     /*Add a button the current screen*/
     lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
     lv_obj_set_size(btn, 120, 50);                          /*Set its size*/
-    //lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_ALL, NULL);           /*Assign a callback to the button*/
+    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL);           /*Assign a callback to the button*/
 
-    lv_obj_t * label = lv_label_create(btn);          /*Add a label to the button*/
-    lv_label_set_text(label, "Button");                     /*Set the labels text*/
+    label = lv_label_create(btn);          /*Add a label to the button*/
+    //lv_label_set_text(label, "Button");                     /*Set the labels text*/
     lv_obj_center(label);
-#else
-    create_widgets();
-#endif
+    btn_event_cb(NULL);
+
 }
+#endif
