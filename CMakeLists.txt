@@ -50,7 +50,8 @@ if(MUSIC_DEMO)
     add_subdirectory(lvgl-demos)
     add_compile_definitions(
         LV_USE_DEMO_MUSIC
-        MUSIC_DEMO)
+        MUSIC_DEMO
+        IS_SIMULATOR)
 
 else()
     message("*******************************")
@@ -63,6 +64,8 @@ else()
         -rdynamic
         lvgl
         ${GTK_LIBRARIES})
+        add_compile_definitions(
+            IS_SIMULATOR)
 endif()
 
 include_directories( ${CMAKE_SOURCE_DIR})

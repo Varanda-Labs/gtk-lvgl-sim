@@ -25,4 +25,5 @@ set(SIM_FILES
 #
 set(APP_FILES
     src/app/app-ui.c
+    src/app/hal-gpio.c
     )

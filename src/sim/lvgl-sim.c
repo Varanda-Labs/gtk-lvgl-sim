@@ -18,6 +18,15 @@
 #define APP_PREFIX "/com/varandalabs/lvglsim"
 #define WINDOW_SIDE_BY_SIDE_SEPARATION   5
 
+GdkPixbuf * led_off_pixbuf = NULL;
+GdkPixbuf * led_on_pixbuf = NULL;
+GtkWidget * leds[4];
+
+void set_led(int index, int state)
+{
+    gtk_image_set_from_pixbuf (leds[index], (state) ? led_on_pixbuf : led_off_pixbuf);
+}
+
 void on_gpio_close_clicked(GtkWidget *widget, gpointer data)
 {
     LOG("Close button\n");
@@ -63,7 +72,7 @@ void on_sw_set(GtkWidget *widget, gpointer data)
         return;
     }
 
-    lv_obj_send_event(GPIO_in[i], input_change_event, data);
+    ui_set_led(i, (int) data);
 }
 
 
@@ -210,6 +219,17 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
         LOG_E("Could not load icon\n");
     }
 
+    led_on_pixbuf = gdk_pixbuf_new_from_resource (APP_PREFIX "/led_on.png", &error);
+    led_off_pixbuf = gdk_pixbuf_new_from_resource (APP_PREFIX "/led_off.png", &error);
+    if (led_on_pixbuf == 0 || led_off_pixbuf == 0) {
+        LOG_E("Could not load LED images\n");
+    }
+
+    leds[0] = gtk_builder_get_object (builder, "id_led_1");
+    leds[1] = gtk_builder_get_object (builder, "id_led_2");
+    leds[2] = gtk_builder_get_object (builder, "id_led_3");
+    leds[3] = gtk_builder_get_object (builder, "id_led_4");
+
     g_signal_connect (window, "destroy", G_CALLBACK (cb_window_destory), NULL);
 
     {
@@ -242,6 +262,8 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
 
     g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) window);
     g_object_unref (builder);
+
+    // set_led(0, 1);
 }
 
 int main (int argc, char **argv)

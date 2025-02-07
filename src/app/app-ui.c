@@ -16,14 +16,12 @@
 
 #define COL_SIZE 70
 #define ROW_SIZE 40
-#define LED_BRIGHTNESS_ON   500
+#define LED_BRIGHTNESS_ON   255 //500
 #define LED_BRIGHTNESS_OFF  50
 
-// Global events
-uint32_t input_change_event;
-lv_obj_t * GPIO_in[4];
-lv_obj_t * analog_input_bar;
 
+static lv_obj_t * GPIO_in[4];
+static lv_obj_t * analog_input_bar;
 static lv_obj_t * GPIO_out[4];
 
 //#define SIMPLE_APP
@@ -33,31 +31,22 @@ static void switch_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
+    int idx = lv_event_get_user_data(e);
+    int state = lv_obj_has_state(obj, LV_STATE_CHECKED);
     if(code == LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_USER("State: %s\n", lv_obj_has_state(obj, LV_STATE_CHECKED) ? "On" : "Off");
+        LV_LOG_USER("idx: %d, State: %s\n", idx, state ? "On" : "Off");
     }
+    set_gpio(idx, state);
 }
 
-static void on_analog_input_changed_event(lv_event_t * e)
+void ui_set_led(int led_index, int on_1_off_0)
 {
-    uint32_t led_idx = (uint32_t) lv_event_get_user_data(e);
-    uint32_t on_off = (uint32_t) lv_event_get_param(e);
-
-    LOG("analog led_idx = %d, on_off = %d\n", led_idx, on_off);
-}
-
-static void on_led_input_changed_event(lv_event_t * e)
-{
-    uint32_t led_idx = (uint32_t) lv_event_get_user_data(e);
-    uint32_t on_off = (uint32_t) lv_event_get_param(e);
-
-    LOG("led_idx = %d, on_off = %d\n", led_idx, on_off);
-    if (on_off) {
-        lv_led_set_brightness(GPIO_in[led_idx], LED_BRIGHTNESS_ON);
+    if (on_1_off_0) {
+        lv_led_set_brightness(GPIO_in[led_index], LED_BRIGHTNESS_ON);
     }
     else {
-        lv_led_set_brightness(GPIO_in[led_idx], LED_BRIGHTNESS_OFF);
-    }
+        lv_led_set_brightness(GPIO_in[led_index], LED_BRIGHTNESS_OFF);
+    }    
 }
 
 static void create_widgets(void)
@@ -79,7 +68,6 @@ static void create_widgets(void)
                                     ROW_SIZE,
                                     LV_GRID_TEMPLATE_LAST};
 
-    input_change_event = lv_event_register_id();
 
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
@@ -110,6 +98,7 @@ static void create_widgets(void)
         GPIO_out[i] = lv_switch_create(cont);
         lv_obj_set_grid_cell(GPIO_out[i], LV_GRID_ALIGN_END, 1, 1,
                             LV_GRID_ALIGN_START, 1 + i, 1);
+        lv_obj_add_event_cb(GPIO_out[i], switch_event_handler, LV_EVENT_VALUE_CHANGED, (void *) i);
 
         // label "input 1"
         label = lv_label_create(cont);
@@ -123,8 +112,6 @@ static void create_widgets(void)
         GPIO_in[i] = lv_led_create(cont);
         lv_obj_set_grid_cell(GPIO_in[i], LV_GRID_ALIGN_END, 4, 1,
                             LV_GRID_ALIGN_START, 1 + i, 1);
-        lv_obj_add_event_cb(GPIO_in[i], on_led_input_changed_event, input_change_event, (void *) i);
-        //lv_obj_add_event_cb(GPIO_in[i], on_led_input_changed_event, input_change_event, i);
         lv_led_set_color(GPIO_in[i], lv_palette_main(LV_PALETTE_RED));
         lv_led_set_brightness(GPIO_in[i], LED_BRIGHTNESS_OFF);
 
@@ -144,7 +131,6 @@ static void create_widgets(void)
     lv_bar_set_value(analog_input_bar, 50, LV_ANIM_OFF);
     lv_obj_set_grid_cell(analog_input_bar, LV_GRID_ALIGN_START, 2, 1,
                             LV_GRID_ALIGN_START, 5, 1);
-    lv_obj_add_event_cb(analog_input_bar, on_analog_input_changed_event, input_change_event, NULL);
 
     // bar value
     label = lv_label_create(cont);
