@@ -13,7 +13,7 @@
 #include "lvgl.h"
 #include "logger.h"
 
-#define GPIO_APP
+#define GPIO_APP   // comment this line to compile a very simple example (single button)
 
 #ifdef GPIO_APP
 // ******************************
@@ -28,8 +28,11 @@
 #define LED_BRIGHTNESS_ON   255
 #define LED_BRIGHTNESS_OFF  50
 
+#define ANALOG_BAR_TEXT_FORMAT "      %d%%"
+
 static lv_obj_t * GPIO_in[4];
 static lv_obj_t * analog_input_bar;
+static lv_obj_t * bar_label;
 static lv_obj_t * GPIO_out[4];
 
 static void switch_event_handler(lv_event_t * e)
@@ -39,7 +42,7 @@ static void switch_event_handler(lv_event_t * e)
     int idx = lv_event_get_user_data(e);
     int state = lv_obj_has_state(obj, LV_STATE_CHECKED);
     if(code == LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_USER("idx: %d, State: %s\n", idx, state ? "On" : "Off");
+        LOG("idx: %d, State: %s\n", idx, state ? "On" : "Off");
     }
     set_gpio(idx, state);
 }
@@ -52,6 +55,14 @@ void ui_set_led(int led_index, int on_1_off_0)
     else {
         lv_led_set_brightness(GPIO_in[led_index], LED_BRIGHTNESS_OFF);
     }    
+}
+
+void ui_set_bar(int level)
+{
+    char txt[32];
+    snprintf(txt, sizeof(txt), ANALOG_BAR_TEXT_FORMAT, level);
+    lv_label_set_text(bar_label, txt);
+        lv_bar_set_value(analog_input_bar, level, LV_ANIM_OFF);
 }
 
 static void create_widgets(void)
@@ -133,15 +144,16 @@ static void create_widgets(void)
     analog_input_bar = lv_bar_create(cont);
     lv_obj_set_size(analog_input_bar, 240, 20);
     lv_obj_center(analog_input_bar);
-    lv_bar_set_value(analog_input_bar, 50, LV_ANIM_OFF);
+    lv_bar_set_value(analog_input_bar, 0, LV_ANIM_OFF);
     lv_obj_set_grid_cell(analog_input_bar, LV_GRID_ALIGN_START, 2, 1,
                             LV_GRID_ALIGN_START, 5, 1);
 
     // bar value
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "      100%");
-    lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 1, 1, // col
+    snprintf(txt, sizeof(txt), ANALOG_BAR_TEXT_FORMAT, 0);
+    bar_label = lv_label_create(cont);
+    lv_label_set_text(bar_label, txt);
+    lv_obj_set_size(bar_label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_grid_cell(bar_label, LV_GRID_ALIGN_START, 1, 1, // col
                          LV_GRID_ALIGN_START, 5, 1);     // row
 
 }
@@ -169,17 +181,18 @@ static void btn_event_cb(lv_event_t * e)
 }
 
 void ui_set_led(int led_index, int on_1_off_0){} // stub
+void ui_set_bar(int level){}
 
 void app_init() // mandatory function.
 {
     lv_obj_clean(lv_screen_active()); 
-    lv_obj_t * btn = lv_button_create(lv_screen_active());     /*Add a button the current screen*/
-    lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
-    lv_obj_set_size(btn, 120, 50);                          /*Set its size*/
-    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL);           /*Assign a callback to the button*/
+    lv_obj_t * btn = lv_button_create(lv_screen_active());  // Add a button the current screen
+    lv_obj_set_pos(btn, 10, 10);                            // Set its position
+    lv_obj_set_size(btn, 120, 50);                          // Set its size
+    lv_obj_add_event_cb(btn, btn_event_cb, 
+                        LV_EVENT_CLICKED, NULL);            // Assign a callback to the button
 
-    label = lv_label_create(btn);          /*Add a label to the button*/
-    //lv_label_set_text(label, "Button");                     /*Set the labels text*/
+    label = lv_label_create(btn);                           // Add a label to the button
     lv_obj_center(label);
     btn_event_cb(NULL);
 

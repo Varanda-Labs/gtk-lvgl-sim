@@ -64,7 +64,7 @@ static void input_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
     if (z > TOUCH_PRESSURE) {
         if (! touch) {
             touch = true;
-            LOG("touch x=%d, y=%d, z=%d", x,y,z);
+            LOG("touch x=%d, y=%d, z=%d\n", x,y,z);
         }
         data->point.x = x;
         data->point.y = y;
@@ -73,7 +73,7 @@ static void input_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
     else {
         if (touch) {
             touch = false;
-            LOG("touch release");
+            LOG("touch release\n");
         }
         data->state = LV_INDEV_STATE_RELEASED;
     }
@@ -84,7 +84,7 @@ static uint64_t get_timestamp_ms()
     struct timespec tp;
     static uint64_t t_ini = 0;
     if (clock_gettime(CLOCK_MONOTONIC, &tp)) {
-        LOG_E("get_timestamp_ms: clock_gettime error");
+        LOG_E("get_timestamp_ms: clock_gettime error\n");
         return 0;
     }
     uint64_t t = tp.tv_sec * 1000; // sec to milli

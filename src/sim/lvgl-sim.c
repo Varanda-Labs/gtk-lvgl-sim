@@ -47,6 +47,7 @@ void on_slider(GtkWidget *widget, gpointer data)
 {
     gdouble v = gtk_range_get_value (widget);
     LOG("Slider, data = %f\n", v);
+    ui_set_bar(v);
 }
 
 void on_sw_set(GtkWidget *widget, gpointer data)
@@ -72,7 +73,7 @@ void on_sw_set(GtkWidget *widget, gpointer data)
         return;
     }
 
-    ui_set_led(i, (int) data);
+    handle_gpio_input_state(i, (int) data);
 }
 
 
