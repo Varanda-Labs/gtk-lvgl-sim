@@ -22,6 +22,9 @@ GdkPixbuf * led_off_pixbuf = NULL;
 GdkPixbuf * led_on_pixbuf = NULL;
 GtkWidget * leds[4];
 
+static GtkWindow * gpio_win = NULL;
+static GtkApplication *app = NULL;
+
 void set_led(int index, int state)
 {
     gtk_image_set_from_pixbuf (leds[index], (state) ? led_on_pixbuf : led_off_pixbuf);
@@ -29,17 +32,28 @@ void set_led(int index, int state)
 
 void on_gpio_close_clicked(GtkWidget *widget, gpointer data)
 {
-    LOG("Close button\n");
+    // LOG("Close button\n");
+    gtk_widget_hide(gpio_win);
 }
 
 void on_menu_quit(GtkWidget *widget, gpointer data)
 {
     LOG("Close button, data = %p\n", data);
+    g_application_quit(G_APPLICATION(app));
+}
+
+void on_menu_about(GtkWidget *widget, gpointer data)
+{
+    LOG("about, data = %p\n", data);
 }
 
 void on_menu_gpio(GtkWidget *widget, gpointer data)
 {
     LOG("Menu GPIO, data = %p\n", data);
+    if (gpio_win) {
+        //set_windows_positions(window, gpio_win);
+        gtk_widget_show_all (GTK_WIDGET (gpio_win));
+    }
 
 }
 
@@ -188,12 +202,18 @@ static void set_windows_positions(GtkWindow * main_win, GtkWindow * gpio_win)
     gtk_window_move (gpio_win, main_x + main_width + WINDOW_SIDE_BY_SIDE_SEPARATION, main_y);
 }
 
+static gboolean on_gpio_win_delete(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    gtk_widget_hide(widget);
+    return TRUE;
+}
+
 static void cb_application_activate (GtkApplication* app, gpointer user_data)
 {
     GtkBuilder* builder = gtk_builder_new ();
     g_return_if_fail (builder != NULL);
 
-    GtkWindow * gpio_win = NULL;
+    // GtkWindow * gpio_win = NULL;
 
     GError* error = NULL;
     builder = gtk_builder_new_from_resource(APP_PREFIX "/lvglsim.glade");
@@ -259,6 +279,10 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     if (gpio_win) {
         set_windows_positions(window, gpio_win);
         gtk_widget_show_all (GTK_WIDGET (gpio_win));
+        g_signal_connect(G_OBJECT(gpio_win), 
+            "delete-event", G_CALLBACK(on_gpio_win_delete), NULL);
+        // g_signal_connect(G_OBJECT(button), 
+        //     "clicked", G_CALLBACK(on_button_clicked), gpio_win);
     }
 
     g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) window);
@@ -269,7 +293,6 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
 
 int main (int argc, char **argv)
 {
-    GtkApplication *app;
     int status;
 
     app = gtk_application_new ("org.varandalabs.mv", G_APPLICATION_FLAGS_NONE);

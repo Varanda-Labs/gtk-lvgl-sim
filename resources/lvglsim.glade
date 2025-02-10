@@ -481,7 +481,7 @@
                         <property name="can-focus">False</property>
                         <property name="image">image1</property>
                         <property name="use-stock">False</property>
-                        <signal name="activate-item" handler="on_menu_gpio" swapped="no"/>
+                        <signal name="activate" handler="on_menu_gpio" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -497,6 +497,7 @@
                         <property name="can-focus">False</property>
                         <property name="use-underline">True</property>
                         <property name="use-stock">True</property>
+                        <signal name="activate" handler="on_menu_quit" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -520,7 +521,7 @@
                         <property name="can-focus">False</property>
                         <property name="use-underline">True</property>
                         <property name="use-stock">True</property>
-                        <signal name="activate-item" handler="on_menu_quit" swapped="no"/>
+                        <signal name="activate" handler="on_menu_about" swapped="no"/>
                       </object>
                     </child>
                   </object>
