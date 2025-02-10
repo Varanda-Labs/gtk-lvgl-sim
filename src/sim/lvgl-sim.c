@@ -53,6 +53,18 @@ void on_menu_about(GtkWidget *widget, gpointer data)
     }
 }
 
+static gboolean on_about_win_delete(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    gtk_widget_hide(widget);
+    return TRUE;
+}
+
+void on_about_dialog_close_button(GtkWidget *widget, gpointer data)
+{
+    LOG("About button\n");
+    gtk_widget_hide(about_win);
+}
+
 void on_menu_gpio(GtkWidget *widget, gpointer data)
 {
     // LOG("Menu GPIO, data = %p\n", data);
@@ -296,6 +308,9 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
                                                 GDK_INTERP_BILINEAR); // GdkInterpType interp_type
 
         gtk_about_dialog_set_logo (  (GtkAboutDialog*) about_win,   logo_pixbuf);
+        gtk_about_dialog_set_license( (GtkAboutDialog*) about_win, NULL);
+        g_signal_connect(G_OBJECT(about_win), 
+            "delete-event", G_CALLBACK(on_about_win_delete), NULL);
     }
 
     g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) window);

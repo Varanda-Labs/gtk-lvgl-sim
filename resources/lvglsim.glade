@@ -424,6 +424,7 @@
 </property>
     <property name="logo-icon-name">image-missing</property>
     <property name="license-type">mit-x11</property>
+    <signal name="response" handler="on_about_dialog_close_button" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can-focus">False</property>
