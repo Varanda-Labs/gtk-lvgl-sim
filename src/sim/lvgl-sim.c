@@ -20,6 +20,9 @@
 #define WINDOW_SIDE_BY_SIDE_SEPARATION   5
 #define LOGO_DIVIDER 10
 
+#define GREETINGS "LVGL Simulator - by Varanda Labs Inc.\n\n"
+#define CMD_OPTIONS "Options:\n  --show-gpio  show GPIO dialog at start up.\n\n"
+
 static GdkPixbuf * led_off_pixbuf = NULL;
 static GdkPixbuf * led_on_pixbuf = NULL;
 static GdkPixbuf * logo_pixbuf = NULL;
@@ -327,11 +330,11 @@ int main (int argc, char **argv)
 {
     int status;
 
-    printf("LVGL Simulator - by Varanda Labs Inc.\n\n");
+    printf(GREETINGS);
     // small argument interpreter
     if (argc > 1) {
         if (strcmp(argv[1], "--help") == 0) {
-            printf("Options:\n  --show-gpio  show GPIO dialog at start up.\n\n");
+            printf(CMD_OPTIONS);
             return 1;
         }
         else if (strcmp(argv[1], "--show-gpio") == 0) {
