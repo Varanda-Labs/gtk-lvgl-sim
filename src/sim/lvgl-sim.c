@@ -17,12 +17,15 @@
 
 #define APP_PREFIX "/com/varandalabs/lvglsim"
 #define WINDOW_SIDE_BY_SIDE_SEPARATION   5
+#define LOGO_DIVIDER 10
 
-GdkPixbuf * led_off_pixbuf = NULL;
-GdkPixbuf * led_on_pixbuf = NULL;
-GtkWidget * leds[4];
+static GdkPixbuf * led_off_pixbuf = NULL;
+static GdkPixbuf * led_on_pixbuf = NULL;
+static GdkPixbuf * logo_pixbuf = NULL;
+static GtkWidget * leds[4];
 
 static GtkWindow * gpio_win = NULL;
+static GtkWindow * about_win = NULL;
 static GtkApplication *app = NULL;
 
 void set_led(int index, int state)
@@ -38,20 +41,22 @@ void on_gpio_close_clicked(GtkWidget *widget, gpointer data)
 
 void on_menu_quit(GtkWidget *widget, gpointer data)
 {
-    LOG("Close button, data = %p\n", data);
+    // LOG("Close button, data = %p\n", data);
     g_application_quit(G_APPLICATION(app));
 }
 
 void on_menu_about(GtkWidget *widget, gpointer data)
 {
     LOG("about, data = %p\n", data);
+    if (about_win) {
+        gtk_widget_show_all(about_win);
+    }
 }
 
 void on_menu_gpio(GtkWidget *widget, gpointer data)
 {
-    LOG("Menu GPIO, data = %p\n", data);
+    // LOG("Menu GPIO, data = %p\n", data);
     if (gpio_win) {
-        //set_windows_positions(window, gpio_win);
         gtk_widget_show_all (GTK_WIDGET (gpio_win));
     }
 
@@ -60,14 +65,14 @@ void on_menu_gpio(GtkWidget *widget, gpointer data)
 void on_slider(GtkWidget *widget, gpointer data)
 {
     gdouble v = gtk_range_get_value (widget);
-    LOG("Slider, data = %f\n", v);
+    // LOG("Slider, data = %f\n", v);
     ui_set_bar(v);
 }
 
 void on_sw_set(GtkWidget *widget, gpointer data)
 {
     char * name = gtk_widget_get_name(widget);
-    LOG("Switch %s is %s\n", name, (data) ? "ON" : "OFF");
+    // LOG("Switch %s is %s\n", name, (data) ? "ON" : "OFF");
     int i;
 
     if (strcmp(name, "sw1") == 0) {
@@ -213,19 +218,18 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     GtkBuilder* builder = gtk_builder_new ();
     g_return_if_fail (builder != NULL);
 
-    // GtkWindow * gpio_win = NULL;
-
     GError* error = NULL;
     builder = gtk_builder_new_from_resource(APP_PREFIX "/lvglsim.glade");
     if (! builder) {
         if (error) {
-            g_error ("Failed to load: %s", error->message);
+            g_error ("Failed to load: %s\n", error->message);
             g_error_free (error);
             return ;
         }
     }
 
     gpio_win = GTK_WINDOW (gtk_builder_get_object (builder, "id_gpio_dialog"));
+    about_win = GTK_WINDOW (gtk_builder_get_object (builder, "id_about_dialog"));
 
     GtkApplicationWindow *window = GTK_APPLICATION_WINDOW (gtk_builder_get_object (builder, "application_window"));
     g_warn_if_fail (window != NULL);
@@ -281,14 +285,21 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
         gtk_widget_show_all (GTK_WIDGET (gpio_win));
         g_signal_connect(G_OBJECT(gpio_win), 
             "delete-event", G_CALLBACK(on_gpio_win_delete), NULL);
-        // g_signal_connect(G_OBJECT(button), 
-        //     "clicked", G_CALLBACK(on_button_clicked), gpio_win);
+    }
+
+    if (about_win)
+    {
+        GdkPixbuf * pixbuf = gdk_pixbuf_new_from_resource (APP_PREFIX "/logo.png", &error);
+        logo_pixbuf = gdk_pixbuf_scale_simple ( pixbuf,    // const GdkPixbuf* src,
+                                                1688 / LOGO_DIVIDER, // int dest_width, // original: 1688 x 180
+                                                180 / LOGO_DIVIDER,  //  int dest_height,
+                                                GDK_INTERP_BILINEAR); // GdkInterpType interp_type
+
+        gtk_about_dialog_set_logo (  (GtkAboutDialog*) about_win,   logo_pixbuf);
     }
 
     g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) window);
     g_object_unref (builder);
-
-    // set_led(0, 1);
 }
 
 int main (int argc, char **argv)
