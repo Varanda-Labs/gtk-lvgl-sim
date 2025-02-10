@@ -14,6 +14,7 @@
 #include "lvgl-integration.h"
 #include "logger.h"
 #include "app-ui.h"
+#include "license.h"
 
 #define APP_PREFIX "/com/varandalabs/lvglsim"
 #define WINDOW_SIDE_BY_SIDE_SEPARATION   5
@@ -27,6 +28,8 @@ static GtkWidget * leds[4];
 static GtkWindow * gpio_win = NULL;
 static GtkWindow * about_win = NULL;
 static GtkApplication *app = NULL;
+
+static int show_gpio_at_start = 0;
 
 void set_led(int index, int state)
 {
@@ -294,9 +297,12 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
 
     if (gpio_win) {
         set_windows_positions(window, gpio_win);
-        gtk_widget_show_all (GTK_WIDGET (gpio_win));
         g_signal_connect(G_OBJECT(gpio_win), 
             "delete-event", G_CALLBACK(on_gpio_win_delete), NULL);
+
+        if (show_gpio_at_start) {
+            gtk_widget_show_all (GTK_WIDGET (gpio_win));
+        }
     }
 
     if (about_win)
@@ -308,7 +314,7 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
                                                 GDK_INTERP_BILINEAR); // GdkInterpType interp_type
 
         gtk_about_dialog_set_logo (  (GtkAboutDialog*) about_win,   logo_pixbuf);
-        gtk_about_dialog_set_license( (GtkAboutDialog*) about_win, NULL);
+        gtk_about_dialog_set_license( (GtkAboutDialog*) about_win, license);
         g_signal_connect(G_OBJECT(about_win), 
             "delete-event", G_CALLBACK(on_about_win_delete), NULL);
     }
@@ -321,11 +327,27 @@ int main (int argc, char **argv)
 {
     int status;
 
+    printf("LVGL Simulator - by Varanda Labs Inc.\n\n");
+    // small argument interpreter
+    if (argc > 1) {
+        if (strcmp(argv[1], "--help") == 0) {
+            printf("Options:\n  --show-gpio  show GPIO dialog at start up.\n\n");
+            return 1;
+        }
+        else if (strcmp(argv[1], "--show-gpio") == 0) {
+            show_gpio_at_start = 1;
+        }
+        else {
+            printf("Unknown parameter: %s\n", argv[1]);
+            return 1;
+        }
+    }
+
     app = gtk_application_new ("org.varandalabs.mv", G_APPLICATION_FLAGS_NONE);
     g_signal_connect (app, "activate", G_CALLBACK (cb_application_activate), NULL);
 
     lv_int_init();
-    status = g_application_run (G_APPLICATION (app), argc, argv);
+    status = g_application_run (G_APPLICATION (app), 1, argv); // do not tell GTK about other arguments
     g_object_unref (app);
 
     return status;

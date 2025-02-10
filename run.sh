@@ -1,2 +1,2 @@
-./build/lvgl-sim
+./build/lvgl-sim $@
 
