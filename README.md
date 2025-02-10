@@ -1,5 +1,7 @@
 ## LVGL Smulator based on GTK3
 
+![Screenshots](resources/lvgl-sim.png "Screenshots")
+
 Easy to build and modify the privided skeleton [App](src/app/app-ui.c) for developing your own UI. 
 - The following instructions work for Debian 11, Ubuntu/Mint 20.04 and up. Other Debian/Ubuntu base distros should also work.
 
