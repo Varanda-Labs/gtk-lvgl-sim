@@ -20,7 +20,9 @@
 #define WINDOW_SIDE_BY_SIDE_SEPARATION   5
 #define LOGO_DIVIDER 10
 
-#define GREETINGS "LVGL Simulator - by Varanda Labs Inc.\n\n"
+#define VERSION "0.01"
+
+#define GREETINGS "LVGL Simulator version " VERSION " - by Varanda Labs Inc.\n\n"
 #define CMD_OPTIONS "Options:\n  --show-gpio  show GPIO dialog at start up.\n\n"
 
 static GdkPixbuf * led_off_pixbuf = NULL;
@@ -318,6 +320,8 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
 
         gtk_about_dialog_set_logo (  (GtkAboutDialog*) about_win,   logo_pixbuf);
         gtk_about_dialog_set_license( (GtkAboutDialog*) about_win, license);
+        gtk_about_dialog_set_version ( (GtkAboutDialog*) about_win, "version: " VERSION);
+
         g_signal_connect(G_OBJECT(about_win), 
             "delete-event", G_CALLBACK(on_about_win_delete), NULL);
     }
