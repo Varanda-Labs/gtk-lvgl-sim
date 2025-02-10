@@ -3,7 +3,7 @@
 Easy to build and modify the privided skeleton [App](src/app/app-ui.c) for developing your own UI. 
 - The following instructions work for Debian 11, Ubuntu/Mint 20.04 and up. Other Debian/Ubuntu base distros should also work.
 
-- Windows and Mac: while easily portable to these platforms I prefer to do not promote spywares.
+- Windows and Mac: while easily portable to these platforms I to do not promote spywares.
 
 ### Install Dependencies:
 ```
