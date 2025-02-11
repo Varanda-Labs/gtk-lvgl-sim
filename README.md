@@ -7,8 +7,8 @@ Easy to build and modify the privided skeleton [App](src/app/app-ui.c) for devel
 
 - Windows and Mac: while easily portable to these platforms I to do not promote spywares.
 ### Video
-[Quick demo about this project](https://old.bitchute.com/video/JKvAN4fh6wpo/)
-
+- [demo on Bitchute](https://old.bitchute.com/video/JKvAN4fh6wpo/)
+- [demo on Rumble](https://rumble.com/v6jhmys-lvgl-simulator.html)
 ### Install Dependencies:
 ```
 sudo apt install build-essential cmake libgtk-3-dev glade git
