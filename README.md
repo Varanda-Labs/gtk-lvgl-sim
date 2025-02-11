@@ -1,4 +1,4 @@
-## LVGL Smulator based on GTK3
+## LVGL Simulator based on GTK3
 
 ![Screenshots](resources/lvgl-sim.png "Screenshots")
 
