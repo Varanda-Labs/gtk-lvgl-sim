@@ -43,6 +43,10 @@ Subsequent rebuilds can skip the clean.sh command
 ```
 ./run.sh
 ```
+Optional parameter to launch GPIO Window on start up:
+```
+./run.sh --show-gpio
+```
 
 ### To clean:
 ```
