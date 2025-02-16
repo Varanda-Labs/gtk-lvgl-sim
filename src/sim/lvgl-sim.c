@@ -232,7 +232,7 @@ static gboolean on_gpio_win_delete(GtkWidget *widget, GdkEvent *event, gpointer 
     gtk_widget_hide(widget);
     return TRUE;
 }
-
+static     GtkApplicationWindow *app_win = NULL;
 static void cb_application_activate (GtkApplication* app, gpointer user_data)
 {
     GtkBuilder* builder = gtk_builder_new ();
@@ -251,14 +251,14 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     gpio_win = GTK_WINDOW (gtk_builder_get_object (builder, "id_gpio_dialog"));
     about_win = GTK_WINDOW (gtk_builder_get_object (builder, "id_about_dialog"));
 
-    GtkApplicationWindow *window = GTK_APPLICATION_WINDOW (gtk_builder_get_object (builder, "application_window"));
-    g_warn_if_fail (window != NULL);
-    g_object_set (window, "application", app, NULL);
-    gtk_window_set_title (GTK_WINDOW (window), "LVGL Simulator");
+    app_win = GTK_APPLICATION_WINDOW (gtk_builder_get_object (builder, "application_window"));
+    g_warn_if_fail (app_win != NULL);
+    g_object_set (app_win, "application", app, NULL);
+    gtk_window_set_title (GTK_WINDOW (app_win), "LVGL Simulator");
 
     GdkPixbuf * icon = gdk_pixbuf_new_from_resource (APP_PREFIX "/lvgl_icon.png", &error);
     if (icon) {
-        gtk_window_set_icon(GTK_WINDOW(window), icon);
+        gtk_window_set_icon(GTK_WINDOW(app_win), icon);
     }
     else {
         LOG_E("Could not load icon\n");
@@ -275,7 +275,7 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
     leds[2] = gtk_builder_get_object (builder, "id_led_3");
     leds[3] = gtk_builder_get_object (builder, "id_led_4");
 
-    g_signal_connect (window, "destroy", G_CALLBACK (cb_window_destory), NULL);
+    g_signal_connect (app_win, "destroy", G_CALLBACK (cb_window_destory), NULL);
 
     {
         drawing_area = GTK_WIDGET (gtk_builder_get_object (builder, "drawing_area"));
@@ -297,11 +297,11 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
 
     gtk_builder_connect_signals(builder,NULL);
 
-    gtk_widget_show_all (GTK_WIDGET (window));
+    gtk_widget_show_all (GTK_WIDGET (app_win));
 
 
     if (gpio_win) {
-        set_windows_positions(window, gpio_win);
+        set_windows_positions(app_win, gpio_win);
         g_signal_connect(G_OBJECT(gpio_win), 
             "delete-event", G_CALLBACK(on_gpio_win_delete), NULL);
 
@@ -326,7 +326,7 @@ static void cb_application_activate (GtkApplication* app, gpointer user_data)
             "delete-event", G_CALLBACK(on_about_win_delete), NULL);
     }
 
-    g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) window);
+    g_timeout_add(LVGL_PERIOD_TIME, (GSourceFunc) time_handler, (gpointer) app_win);
     g_object_unref (builder);
 }
 

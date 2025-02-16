@@ -16,7 +16,10 @@
 #include <time.h>
 
 #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565))
-static uint8_t lvgl_buf[LCD_WIDTH * LCD_HEIGHT / 10 * BYTES_PER_PIXEL];
+#define LVGL_BUF_SIZE (LCD_WIDTH * LCD_HEIGHT * BYTES_PER_PIXEL)
+
+static uint8_t * lvgl_buf = NULL;
+static uint8_t * pixel_buf = NULL;
 
 cairo_surface_t *lv_int_surface = NULL;
 GtkWidget *drawing_area = NULL;
@@ -97,6 +100,7 @@ static uint64_t get_timestamp_ms()
     return t;
 }
 
+
 static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
 {
     #define PIXEL_SIZE 1
@@ -105,28 +109,52 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
         lv_display_flush_ready(display);
         return;
     }
-    cairo_t *cr = cairo_create (lv_int_surface);
+    if (lvgl_buf == NULL ||  pixel_buf == NULL) {
+        lv_display_flush_ready(display);
+        return;
+    }
 
-    int x, y, ri, gi, bi;
-    double r,g,b;
     uint16_t * color_p = (uint16_t *) px_map;
+    int32_t y;
+    int32_t x;
+    int32_t p;
     for(y = area->y1; y <= area->y2; y++) {
+        p = (y * LCD_WIDTH + area->x1) * 3;
         for(x = area->x1; x <= area->x2; x++) {
             // *color_p format (565): rrrrrGGGGGGbbbbb
+            pixel_buf[p] = (*color_p >> 8) & 0b11111000;
+            pixel_buf[p + 1] = (*color_p >> 3) & 0b11111100;
+            pixel_buf[p + 2] = (*color_p << 3) & 0b11111000;
 
-            r = ((*color_p) >> 11) / (double) 0b00011111;
-            g = (((*color_p) >> 5) & 0b00111111) / (double) 0b00111111;
-            b = ((*color_p) & 0b00011111) / (double) 0b00011111;
-
-            cairo_set_source_rgba (cr, r, g, b, 1);
-            cairo_rectangle (cr, x, y, PIXEL_SIZE, PIXEL_SIZE);
-            cairo_fill (cr);
+            p += 3;
             color_p++;
         }
     }
+
+    if (drawing_area && lv_int_surface) {
+
+        GdkPixbuf * pixbuf = gdk_pixbuf_new_from_data(  (guchar*)pixel_buf, 
+                                            GDK_COLORSPACE_RGB, 
+                                            false, 
+                                            8, 
+                                            LCD_WIDTH, 
+                                            LCD_HEIGHT, 
+                                            LCD_WIDTH * 3, 
+                                            NULL, 
+                                            NULL);
+        if (!pixbuf) {
+            LOG_E("Could not create pixbuf for display\n");
+            return;
+        }
+
+        cairo_t *cr = cairo_create (lv_int_surface);
+        gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
+        cairo_paint(cr);
+        cairo_destroy (cr);
+        g_object_unref(pixbuf);
+    }
     gtk_widget_queue_draw_area (drawing_area, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 
-    cairo_destroy (cr);
     lv_display_flush_ready(display);
 
 }
@@ -154,14 +182,20 @@ void lv_int_init()
 {
     lv_init();
 
-    //lv_tick_set_cb((lv_tick_get_cb_t) get_timestamp_ms);
+    lvgl_buf = (uint8_t *) malloc (LVGL_BUF_SIZE);
+    pixel_buf = (uint8_t *) malloc (LCD_WIDTH * LCD_HEIGHT * 3);
+
+    if (lvgl_buf == NULL ||  pixel_buf == NULL) {
+        LOG_E("No memo for LCD buffers\n");
+    }
+
     lvgl_display = lv_display_create(LCD_WIDTH, LCD_HEIGHT);
 
     lv_display_set_buffers( lvgl_display, 
                             lvgl_buf, 
                             NULL, 
-                            sizeof(lvgl_buf),
-                            LV_DISPLAY_RENDER_MODE_PARTIAL);
+                            LVGL_BUF_SIZE,
+                            LV_DISPLAY_RENDER_MODE_FULL);
                             
     lv_display_set_flush_cb(lvgl_display, flush_cb);
 
