@@ -16,11 +16,8 @@
 #include <time.h>
 
 #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565))
-static uint8_t lvgl_buf[LCD_WIDTH * (LCD_HEIGHT / 10) * BYTES_PER_PIXEL];
+static uint8_t lvgl_buf[LCD_WIDTH * LCD_HEIGHT * BYTES_PER_PIXEL];
 static uint8_t pixel_buf[LCD_WIDTH * LCD_HEIGHT * 3];
-
-
-//static uint8_t fb[LV_HOR_RES_MAX * LV_VER_RES_MAX * 3];
 
 cairo_surface_t *lv_int_surface = NULL;
 GtkWidget *drawing_area = NULL;
@@ -208,25 +205,19 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
     int32_t x;
     int32_t p;
     for(y = area->y1; y <= area->y2; y++) {
-    //for(y = area->y1; y <= area->y2 && y < disp_drv->ver_res; y++) {
         p = (y * LCD_WIDTH + area->x1) * 3;
-        //for(x = area->x1; x <= area->x2 && x < disp_drv->hor_res; x++) {
         for(x = area->x1; x <= area->x2; x++) {
-            // lvgl_buf[p] = ((*color_p) >> 11) & 0b00011111; //color_p->ch.red;
-            // lvgl_buf[p + 1] = (((*color_p) >> 5) & 0b00111111); //color_p->ch.green;
-            // lvgl_buf[p + 2] = ((*color_p) & 0b00011111); //color_p->ch.blue;
 
             // *color_p format (565): rrrrrGGGGGGbbbbb
-            pixel_buf[p] = (*color_p >> 8) & 0b0000000011111000; //color_p->ch.red;
-            pixel_buf[p + 1] = (*color_p >> 3) & 0b0000000011111100; //color_p->ch.green;
-            pixel_buf[p + 2] = (*color_p << 3) & 0b0000000011111000;  //color_p->ch.blue;
+            pixel_buf[p] = (*color_p >> 8) & 0b11111000;
+            pixel_buf[p + 1] = (*color_p >> 3) & 0b11111100;
+            pixel_buf[p + 2] = (*color_p << 3) & 0b11111000;
 
             p += 3;
             color_p++;
         }
     }
 
-    //memset(pixel_buf, 0x80, sizeof(pixel_buf));
     if (drawing_area /* && lv_int_surface */) {
         //gtk_image_set_from_pixbuf ((GtkImage *) drawing_area, pixbuf);
 
@@ -245,15 +236,8 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
             return;
         }
 
-        // lv_int_surface = gdk_cairo_surface_create_from_pixbuf (
-        //     pixbuf,
-        //     0,
-        //     GdkWindow* for_window);
-
-
         cairo_t *cr = cairo_create (lv_int_surface);
         gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-        //cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
         cairo_paint(cr);
         // cairo_destroy (cr);
         // gdk_pixbuf_unref(pixbuf);
